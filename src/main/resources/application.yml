@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: Ai-Interview
+  datasource:
+    username: postgres
+    password: root
+    url: jdbc:postgresql://localhost:5432/interview_schedule
+  jpa:
+    hibernate:
+      ddl-auto: update
+server:
+  port: 2999

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interview Booking — Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --purple-50:  #EEEDFE;
+            --purple-200: #AFA9EC;
+            --purple-400: #7F77DD;
+            --purple-600: #534AB7;
+            --purple-800: #3C3489;
+            --purple-900: #26215C;
+            --green-50:   #EAF3DE;
+            --green-600:  #3B6D11;
+            --green-800:  #27500A;
+            --amber-50:   #FAEEDA;
+            --amber-600:  #854F0B;
+            --red-50:     #FCEBEB;
+            --red-600:    #791F1F;
+            --blue-50:    #E6F1FB;
+            --blue-200:   #B5D4F4;
+            --blue-700:   #185FA5;
+            --gray-100:   #f7f6f3;
+            --gray-200:   #eeece7;
+            --gray-300:   #d9d7cf;
+            --gray-400:   #b0aea6;
+            --gray-600:   #6b6963;
+            --gray-900:   #1c1b19;
+            --surface:    #ffffff;
+            --border:     rgba(28,27,25,0.1);
+            --border-md:  rgba(28,27,25,0.18);
+            --radius:     10px;
+            --radius-lg:  16px;
+            --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md:  0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+            --shadow-lg:  0 12px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.05);
+            --font: 'DM Sans', sans-serif;
+            --mono: 'DM Mono', monospace;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font);
+            background: var(--gray-100);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 3rem 1rem 4rem;
+            color: var(--gray-900);
+        }
+
+        /* Background decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                    radial-gradient(ellipse 700px 500px at 10% 5%, rgba(127,119,221,0.08) 0%, transparent 70%),
+                    radial-gradient(ellipse 500px 400px at 90% 90%, rgba(83,74,183,0.07) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+            z-index: 1;
+            animation: fadeUp 0.5s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity:0; transform: translateY(18px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        /* ── CARD ── */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        /* ── HEADER ── */
+        .card-header {
+            padding: 2.25rem 2.5rem 2rem;
+            background: linear-gradient(135deg, var(--purple-600) 0%, var(--purple-800) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+        }
+        .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; left: -20px;
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 1.25rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .header-icon svg { width: 24px; height: 24px; stroke: #fff; fill: none; stroke-width: 1.8; }
+
+        .header-text h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+        .header-text p {
+            font-size: 13.5px;
+            color: rgba(255,255,255,0.65);
+            margin-top: 3px;
+        }
+
+        .header-badge {
+            position: relative; z-index: 1;
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 100px;
+            padding: 5px 14px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.85);
+            font-weight: 500;
+        }
+        .badge-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #7EE8A2;
+            animation: pulse 2s ease infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity:1; transform: scale(1); }
+            50%      { opacity:.5; transform: scale(0.8); }
+        }
+
+        /* ── BODY ── */
+        .card-body { padding: 2rem 2.5rem 2.5rem; }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            margin-bottom: 1rem;
+        }
+
+        /* ── GRID ── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 7px; }
+        .form-group.full { grid-column: 1 / -1; }
+
+        label {
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--gray-600);
+            display: flex; align-items: center; gap: 4px;
+        }
+        label .req { color: #D85A30; font-size: 13px; line-height: 1; }
+
+        input, select, textarea {
+            font-family: var(--font);
+            font-size: 14.5px;
+            color: var(--gray-900);
+            background: var(--gray-100);
+            border: 1px solid var(--border-md);
+            border-radius: var(--radius);
+            padding: 0 14px;
+            height: 44px;
+            width: 100%;
+            outline: none;
+            transition: border-color .18s, box-shadow .18s, background .18s;
+        }
+        input:hover, select:hover, textarea:hover {
+            background: #fff;
+            border-color: var(--gray-300);
+        }
+        input:focus, select:focus, textarea:focus {
+            background: #fff;
+            border-color: var(--purple-400);
+            box-shadow: 0 0 0 3.5px rgba(127,119,221,0.14);
+        }
+        input::placeholder, textarea::placeholder { color: var(--gray-400); font-size: 14px; }
+
+        textarea {
+            height: 100px;
+            padding: 12px 14px;
+            resize: vertical;
+            line-height: 1.55;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23b0aea6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 38px;
+            cursor: pointer;
+        }
+
+        /* ── DIFFICULTY ── */
+        .diff-wrap { display: flex; gap: 8px; }
+        .diff-btn {
+            flex: 1;
+            height: 44px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-md);
+            background: var(--gray-100);
+            font-family: var(--font);
+            font-size: 13.5px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--gray-600);
+            transition: all .18s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .diff-btn:hover {
+            background: #fff;
+            border-color: var(--gray-300);
+            color: var(--gray-900);
+        }
+        .diff-btn.sel-easy   { background: var(--green-50); border-color: #639922; color: var(--green-600); }
+        .diff-btn.sel-medium { background: var(--amber-50); border-color: #BA7517; color: var(--amber-600); }
+        .diff-btn.sel-hard   { background: var(--red-50);   border-color: #A32D2D; color: var(--red-600); }
+
+        .diff-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            display: inline-block;
+        }
+        .diff-btn:nth-child(1) .diff-dot { background: #639922; }
+        .diff-btn:nth-child(2) .diff-dot { background: #BA7517; }
+        .diff-btn:nth-child(3) .diff-dot { background: #A32D2D; }
+
+        /* ── DIVIDER ── */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1.75rem 0;
+        }
+
+        /* ── SUBMIT ── */
+        .submit-btn {
+            width: 100%;
+            height: 50px;
+            border-radius: var(--radius);
+            border: none;
+            background: linear-gradient(135deg, var(--purple-600), var(--purple-800));
+            color: #fff;
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 9px;
+            letter-spacing: 0.01em;
+            transition: opacity .18s, transform .12s, box-shadow .18s;
+            box-shadow: 0 4px 14px rgba(83,74,183,0.35);
+        }
+        .submit-btn:hover   { opacity: .92; box-shadow: 0 6px 20px rgba(83,74,183,0.4); }
+        .submit-btn:active  { transform: scale(0.99); }
+        .submit-btn:disabled {
+            background: var(--gray-200);
+            color: var(--gray-400);
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 1;
+        }
+        .submit-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+
+        /* ── SPINNER ── */
+        .spinner {
+            width: 20px; height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .65s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── SUCCESS PANEL ── */
+        .success-panel {
+            display: none;
+            padding: 2.5rem 2.5rem 3rem;
+            text-align: center;
+            animation: fadeUp .45s ease both;
+        }
+
+        .success-ring {
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            background: var(--green-50);
+            border: 2px solid #97C459;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+        .success-ring svg { width: 30px; height: 30px; stroke: var(--green-600); fill: none; stroke-width: 2.2; }
+
+        .success-panel h2 {
+            font-size: 21px;
+            font-weight: 600;
+            color: var(--gray-900);
+            letter-spacing: -0.2px;
+            margin-bottom: 8px;
+        }
+        .success-panel > p {
+            font-size: 14px;
+            color: var(--gray-600);
+            line-height: 1.65;
+            max-width: 420px;
+            margin: 0 auto 1.75rem;
+        }
+
+        /* ── CRED CARD ── */
+        .cred-card {
+            background: var(--gray-100);
+            border: 1px solid var(--border-md);
+            border-radius: var(--radius-lg);
+            padding: 0;
+            margin-bottom: 1.25rem;
+            overflow: hidden;
+            text-align: left;
+        }
+        .cred-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 18px;
+        }
+        .cred-row:not(:last-child) { border-bottom: 1px solid var(--border); }
+        .cred-label {
+            font-size: 12px;
+            color: var(--gray-400);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .cred-right { display: flex; align-items: center; gap: 10px; }
+        .cred-value {
+            font-family: var(--mono);
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+        .cred-value.plain { font-family: var(--font); font-size: 13.5px; }
+        .copy-btn {
+            font-family: var(--font);
+            font-size: 11.5px;
+            font-weight: 500;
+            background: #fff;
+            border: 1px solid var(--border-md);
+            border-radius: 7px;
+            padding: 4px 10px;
+            cursor: pointer;
+            color: var(--gray-600);
+            transition: all .15s;
+        }
+        .copy-btn:hover { color: var(--gray-900); border-color: var(--gray-300); background: var(--gray-100); }
+        .copy-btn.copied { color: var(--green-600); border-color: #97C459; background: var(--green-50); }
+
+        /* ── NOTICE ── */
+        .notice {
+            background: var(--blue-50);
+            border: 1px solid var(--blue-200);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+        .notice svg { width: 16px; height: 16px; stroke: var(--blue-700); fill: none; stroke-width: 2; flex-shrink: 0; margin-top: 1px; }
+        .notice span { font-size: 13px; color: var(--blue-700); line-height: 1.55; }
+
+        /* ── RESET BTN ── */
+        .reset-btn {
+            background: none;
+            border: 1px solid var(--border-md);
+            border-radius: var(--radius);
+            padding: 11px 28px;
+            font-family: var(--font);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all .15s;
+        }
+        .reset-btn:hover { color: var(--gray-900); border-color: var(--gray-300); background: var(--gray-100); }
+
+        /* ── VALIDATION ── */
+        .form-group.error input,
+        .form-group.error select,
+        .form-group.error textarea {
+            border-color: #D85A30;
+            box-shadow: 0 0 0 3px rgba(216,90,48,0.1);
+        }
+        .err-msg {
+            font-size: 12px;
+            color: #993C1D;
+            display: none;
+        }
+        .form-group.error .err-msg { display: block; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 560px) {
+            body { padding: 1.5rem 0.75rem 3rem; }
+            .card-header { padding: 1.75rem 1.5rem 1.5rem; }
+            .card-body   { padding: 1.5rem 1.5rem 2rem; }
+            .success-panel { padding: 2rem 1.5rem 2.5rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .diff-wrap { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <!-- HEADER -->
+        <div class="card-header">
+            <div class="header-top">
+                <div class="header-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+                </div>
+                <div class="header-text">
+                    <h1>Interview Scheduler</h1>
+                    <p>Admin panel — book and manage candidate interviews</p>
+                </div>
+            </div>
+            <div class="header-badge">
+                <span class="badge-dot"></span>
+                System active
+            </div>
+        </div>
+
+        <!-- FORM -->
+        <div class="card-body" id="formSection">
+            <p class="section-title">Candidate information</p>
+
+            <div class="form-grid">
+
+                <!-- Name -->
+                <div class="form-group" id="grp-name">
+                    <label>Full name <span class="req">*</span></label>
+                    <input type="text" id="candidateName" placeholder="e.g. Ananya Sharma" autocomplete="name" />
+                    <span class="err-msg">Please enter the candidate's name.</span>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group" id="grp-email">
+                    <label>Email address <span class="req">*</span></label>
+                    <input type="email" id="candidateEmail" placeholder="candidate@example.com" autocomplete="email" />
+                    <span class="err-msg">Enter a valid email address.</span>
+                </div>
+
+                <!-- Domain -->
+                <div class="form-group" id="grp-domain">
+                    <label>Interview domain <span class="req">*</span></label>
+                    <select id="domain">
+                        <option value="">Select a domain</option>
+                        <option>Frontend Development</option>
+                        <option>Backend Development</option>
+                        <option>Full Stack Development</option>
+                        <option>Data Science &amp; ML</option>
+                        <option>DevOps &amp; Cloud</option>
+                        <option>Mobile Development</option>
+                        <option>System Design</option>
+                        <option>Product Management</option>
+                        <option>UI/UX Design</option>
+                        <option>QA &amp; Testing</option>
+                        <option>Cybersecurity</option>
+                        <option>Blockchain Development</option>
+                    </select>
+                    <span class="err-msg">Please select a domain.</span>
+                </div>
+
+                <!-- Experience -->
+                <div class="form-group" id="grp-experience">
+                    <label>Experience level <span class="req">*</span></label>
+                    <select id="experience">
+                        <option value="">Select experience</option>
+                        <option>Fresher (0 – 1 yr)</option>
+                        <option>Junior (1 – 3 yrs)</option>
+                        <option>Mid-level (3 – 5 yrs)</option>
+                        <option>Senior (5 – 8 yrs)</option>
+                        <option>Lead / Principal (8+ yrs)</option>
+                    </select>
+                    <span class="err-msg">Please select experience level.</span>
+                </div>
+
+                <!-- Difficulty -->
+                <div class="form-group full" id="grp-difficulty">
+                    <label>Difficulty <span class="req">*</span></label>
+                    <div class="diff-wrap">
+                        <button class="diff-btn" data-level="Easy" data-cls="sel-easy" onclick="setDiff(this)">
+                            <span class="diff-dot"></span> Easy
+                        </button>
+                        <button class="diff-btn" data-level="Medium" data-cls="sel-medium" onclick="setDiff(this)">
+                            <span class="diff-dot"></span> Medium
+                        </button>
+                        <button class="diff-btn" data-level="Hard" data-cls="sel-hard" onclick="setDiff(this)">
+                            <span class="diff-dot"></span> Hard
+                        </button>
+                    </div>
+                    <span class="err-msg">Please choose a difficulty level.</span>
+                </div>
+
+                <!-- Date -->
+                <div class="form-group full" id="grp-date">
+                    <label>Interview date &amp; time <span class="req">*</span></label>
+                    <input type="datetime-local" id="interviewDate" />
+                    <span class="err-msg">Please pick an interview date and time.</span>
+                </div>
+
+                <!-- Notes -->
+                <div class="form-group full">
+                    <label>Admin notes</label>
+                    <textarea id="adminNotes" placeholder="Special instructions, focus areas, or notes for the interviewer…"></textarea>
+                </div>
+
+            </div>
+
+            <div class="divider"></div>
+
+            <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">
+                <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+                Book interview
+            </button>
+        </div>
+
+        <!-- SUCCESS -->
+        <div class="success-panel" id="successSection">
+            <div class="success-ring">
+                <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <h2>Interview booked!</h2>
+            <p>A confirmation email has been dispatched to the candidate with their login credentials and interview details.</p>
+
+            <div class="cred-card">
+                <div class="cred-row">
+                    <span class="cred-label">User ID</span>
+                    <div class="cred-right">
+                        <span class="cred-value" id="outUserId"></span>
+                        <button class="copy-btn" onclick="copyField('outUserId', this)">Copy</button>
+                    </div>
+                </div>
+                <div class="cred-row">
+                    <span class="cred-label">Temp password</span>
+                    <div class="cred-right">
+                        <span class="cred-value" id="outPassword"></span>
+                        <button class="copy-btn" onclick="copyField('outPassword', this)">Copy</button>
+                    </div>
+                </div>
+                <div class="cred-row">
+                    <span class="cred-label">Candidate</span>
+                    <span class="cred-value plain" id="outName"></span>
+                </div>
+                <div class="cred-row">
+                    <span class="cred-label">Email</span>
+                    <div class="cred-right">
+                        <span class="cred-value plain" id="outEmail"></span>
+                        <button class="copy-btn" onclick="copyField('outEmail', this)">Copy</button>
+                    </div>
+                </div>
+                <div class="cred-row">
+                    <span class="cred-label">Domain</span>
+                    <span class="cred-value plain" id="outDomain"></span>
+                </div>
+                <div class="cred-row">
+                    <span class="cred-label">Experience</span>
+                    <span class="cred-value plain" id="outExp"></span>
+                </div>
+                <div class="cred-row">
+                    <span class="cred-label">Difficulty</span>
+                    <span class="cred-value plain" id="outDiff"></span>
+                </div>
+                <div class="cred-row">
+                    <span class="cred-label">Scheduled</span>
+                    <span class="cred-value plain" id="outDate"></span>
+                </div>
+            </div>
+
+            <div class="notice">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                <span>
+          Candidate record saved to PostgreSQL. In production, wire up your backend endpoint to persist this data and trigger real email delivery via your SMTP / SendGrid service.
+        </span>
+            </div>
+
+            <button class="reset-btn" onclick="resetForm()">+ Book another interview</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    /* ── State ── */
+    let selectedDiff = '';
+
+    /* ── Difficulty toggle ── */
+    function setDiff(el) {
+        document.querySelectorAll('.diff-btn').forEach(b => {
+            b.className = 'diff-btn';
+        });
+        el.classList.add(el.dataset.cls);
+        selectedDiff = el.dataset.level;
+        clearErr('grp-difficulty');
+    }
+
+    /* ── Generators ── */
+    function genUserId() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        return 'CND-' + Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    }
+
+    function genPassword() {
+        const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+        const lower = 'abcdefghjkmnpqrstuvwxyz';
+        const nums  = '23456789';
+        const sym   = '@#$!%&*';
+        const all   = upper + lower + nums + sym;
+        const pick  = s => s[Math.floor(Math.random() * s.length)];
+        let pwd = pick(upper) + pick(lower) + pick(nums) + pick(sym);
+        for (let i = 0; i < 6; i++) pwd += pick(all);
+        return pwd.split('').sort(() => Math.random() - 0.5).join('');
+    }
+
+    /* ── Validation helpers ── */
+    function setErr(id, show) {
+        const g = document.getElementById(id);
+        if (show) g.classList.add('error');
+        else g.classList.remove('error');
+    }
+    function clearErr(id) { setErr(id, false); }
+
+    function validate() {
+        let ok = true;
+        const name  = document.getElementById('candidateName').value.trim();
+        const email = document.getElementById('candidateEmail').value.trim();
+        const dom   = document.getElementById('domain').value;
+        const exp   = document.getElementById('experience').value;
+        const date  = document.getElementById('interviewDate').value;
+
+        setErr('grp-name',       !name);
+        setErr('grp-email',      !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+        setErr('grp-domain',     !dom);
+        setErr('grp-experience', !exp);
+        setErr('grp-difficulty', !selectedDiff);
+        setErr('grp-date',       !date);
+
+        if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !dom || !exp || !selectedDiff || !date) ok = false;
+        return ok;
+    }
+
+    /* Live-clear errors on change */
+    ['candidateName','candidateEmail','domain','experience','interviewDate'].forEach(id => {
+        const el = document.getElementById(id);
+        const map = { candidateName:'grp-name', candidateEmail:'grp-email', domain:'grp-domain', experience:'grp-experience', interviewDate:'grp-date' };
+        el.addEventListener('input',  () => clearErr(map[id]));
+        el.addEventListener('change', () => clearErr(map[id]));
+    });
+
+    /* ── Submit ── */
+    function handleSubmit() {
+        if (!validate()) return;
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner"></div> Processing…';
+
+        /* Simulate async backend call */
+        setTimeout(() => {
+            const userId   = genUserId();
+            const password = genPassword();
+            const dateRaw  = document.getElementById('interviewDate').value;
+            const dateStr  = new Date(dateRaw).toLocaleString('en-IN', { dateStyle: 'long', timeStyle: 'short' });
+
+            document.getElementById('outUserId').textContent   = userId;
+            document.getElementById('outPassword').textContent = password;
+            document.getElementById('outName').textContent     = document.getElementById('candidateName').value.trim();
+            document.getElementById('outEmail').textContent    = document.getElementById('candidateEmail').value.trim();
+            document.getElementById('outDomain').textContent   = document.getElementById('domain').value;
+            document.getElementById('outExp').textContent      = document.getElementById('experience').value;
+            document.getElementById('outDiff').textContent     = selectedDiff;
+            document.getElementById('outDate').textContent     = dateStr;
+
+            document.getElementById('formSection').style.display    = 'none';
+            document.getElementById('successSection').style.display = 'block';
+        }, 1800);
+    }
+
+    /* ── Copy to clipboard ── */
+    function copyField(id, btn) {
+        const val = document.getElementById(id).textContent;
+        navigator.clipboard.writeText(val).then(() => {
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = 'Copy';
+                btn.classList.remove('copied');
+            }, 2000);
+        });
+    }
+
+    /* ── Reset ── */
+    function resetForm() {
+        ['candidateName','candidateEmail','adminNotes'].forEach(id => document.getElementById(id).value = '');
+        ['domain','experience'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('interviewDate').value = '';
+        document.querySelectorAll('.diff-btn').forEach(b => b.className = 'diff-btn');
+        selectedDiff = '';
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = false;
+        btn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 7"/></svg> Book interview`;
+
+        document.getElementById('successSection').style.display = 'none';
+        document.getElementById('formSection').style.display    = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+</body>
+</html>
