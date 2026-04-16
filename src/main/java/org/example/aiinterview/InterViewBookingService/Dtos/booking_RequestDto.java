@@ -36,5 +36,7 @@ public class booking_RequestDto {
 
     private LocalDateTime interviewDateTime;
 
+    private String admin_notes;
+
 
 }

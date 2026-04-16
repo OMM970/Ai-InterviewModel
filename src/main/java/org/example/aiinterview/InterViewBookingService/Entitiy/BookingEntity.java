@@ -1,6 +1,5 @@
 package org.example.aiinterview.InterViewBookingService.Entitiy;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "interview_bookings")
-public class BooingEntity {
+public class BookingEntity {
 
 
     @Id
@@ -43,6 +42,8 @@ public class BooingEntity {
     private Interview_Status  interview_Status;
 
     private LocalDateTime interviewDateTime;
+
+    private String admin_notes;
 
 
 

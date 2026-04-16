@@ -15,12 +15,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class booking_ResponseDto {
-    private String id;
+    private long id;
     private String fullName;
     private String email;
     private Interview_domain interview_Domain;
     private String others_Domain;
     private Experience_Levels experience_Level;
     private LocalDateTime interviewDateTime;
+    private String admin_notes;
 
 }
