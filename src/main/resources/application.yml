@@ -8,5 +8,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: credential_db
+
 server:
   port: 2999

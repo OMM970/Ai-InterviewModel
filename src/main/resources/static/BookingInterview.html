@@ -172,6 +172,8 @@
             margin-top: 1.5rem;
         }
 
+
+
         .cred-row {
             display: flex;
             justify-content: space-between;
@@ -311,7 +313,14 @@
                     <span>Date</span>
                     <span id="outDate"></span>
                 </div>
+                <div class="cred-row">
+                    <span>Interview ID</span>
+                    <span id="outInterviewId"></span>
+                </div>
             </div>
+            <p style="margin-top:16px; color:#b45309; font-size:13px; line-height:1.6;">
+                Warning: The password has been sent to the candidate email and will expire at 11:59 PM on the interview day.
+            </p>
         </div>
 
     </div>
@@ -449,6 +458,7 @@
                     : formatEnum(data.interview_Domain);
 
             document.getElementById('outExp').textContent = formatEnum(data.experience_Level);
+            document.getElementById('outDate').textContent = new Date(data.interviewDateTime).toLocaleString('en-IN');
             document.getElementById('outDate').textContent = new Date(data.interviewDateTime).toLocaleString('en-IN');
 
             document.getElementById('formSection').style.display = 'none';

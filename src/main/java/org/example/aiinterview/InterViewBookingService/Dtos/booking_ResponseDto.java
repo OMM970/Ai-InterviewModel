@@ -24,5 +24,7 @@ public class booking_ResponseDto {
     private LocalDateTime interviewDateTime;
     private String admin_notes;
     private String others_domain;
+    private String userID;
+
 
 }
