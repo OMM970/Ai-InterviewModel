@@ -13,6 +13,9 @@ spring:
       host: localhost
       port: 27017
       database: credential_db
+    redis:
+      port: 6379
+      host: localhost
 
 server:
   port: 2999

@@ -1,6 +1,7 @@
 package org.example.aiinterview.InterViewBookingService.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.aiinterview.InterViewBookingService.Dtos.booking_RequestDto;
 import org.example.aiinterview.InterViewBookingService.Dtos.booking_ResponseDto;
 import org.example.aiinterview.InterViewBookingService.Entitiy.BookingEntity;
@@ -16,10 +17,12 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookingService implements BookingServiceImpl {
     private final BookingRepositroy bookingRepositroy;
     private final PasswordEncoder passwordEncoder;
     private final Credential_Repo  credential_repo;
+    private final CredentialGeneratorService credentialGeneratorService;
 
 
     @Override
@@ -74,6 +77,11 @@ public class BookingService implements BookingServiceImpl {
         credentialEntity.setInterviewId(interviewId);
         credentialEntity.setPasswordHash(hashedPassword);
         credentialEntity.setCreatedAt(LocalDateTime.now());
+        LocalDateTime expiryTime = bookingRequestDto.getInterviewDateTime().plusHours(24);
+
+        credentialGeneratorService.saveInterviewId(interviewId,hashedPassword,expiryTime);
+        log.info("Credentila saved to Reedis Sucessfullt"+interviewId);
+
 
         credentialEntity.setExpiresAt(
                 bookingRequestDto.getInterviewDateTime()
