@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>HR Dashboard — Interview Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+            --p50:#eeedfe;--p100:#cecbf6;--p400:#7f77dd;--p600:#534ab7;--p800:#3c3489;
+            --s50:#e1f5ee;--s400:#1d9e75;--s600:#0f6e56;
+            --a50:#faeeda;--a400:#ba7517;--a600:#854f0b;
+            --r50:#fcebeb;--r400:#e24b4a;--r600:#a32d2d;
+            --g50:#f8f7f4;--g100:#edecea;--g200:#d4d2cd;--g400:#9e9b94;--g600:#635f58;--g800:#2a2825;--g900:#1a1917;
+            --surface:#fff;--border:rgba(28,27,25,0.09);--border-md:rgba(28,27,25,0.16);
+            --radius:10px;--radius-lg:16px;
+            --shadow-sm:0 1px 3px rgba(0,0,0,0.06);
+            --font:'DM Sans',sans-serif;--font-display:'Syne',sans-serif;--font-mono:'DM Mono',monospace;
+        }
+        body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:100vh;display:flex;overflow-x:hidden}
+
+        /* SIDEBAR */
+        .sidebar{width:228px;min-height:100vh;background:var(--g900);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+        .sb-logo{padding:26px 22px 20px;border-bottom:1px solid rgba(255,255,255,0.06)}
+        .sb-logo .brand{font-family:var(--font-display);font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.3px}
+        .sb-logo .sub{font-size:10.5px;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:1.3px;margin-top:3px}
+        .sb-nav{padding:16px 12px;flex:1}
+        .nav-label{font-size:10px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,0.22);padding:0 10px;margin:18px 0 6px}
+        .nav-label:first-child{margin-top:0}
+        .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13.5px;font-weight:500;color:rgba(255,255,255,0.46);cursor:pointer;transition:all 0.15s;text-decoration:none;user-select:none}
+        .nav-item:hover{color:rgba(255,255,255,0.8);background:rgba(255,255,255,0.05)}
+        .nav-item.active{color:#fff;background:var(--p600)}
+        .nav-item svg{width:15px;height:15px;flex-shrink:0}
+        .nav-badge{margin-left:auto;background:var(--p400);color:#fff;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px}
+        .sb-footer{padding:14px 12px;border-top:1px solid rgba(255,255,255,0.06)}
+        .hr-chip{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer}
+        .hr-chip:hover{background:rgba(255,255,255,0.05)}
+        .avatar{width:32px;height:32px;border-radius:50%;background:var(--p600);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+        .hr-info .name{font-size:13px;font-weight:500;color:rgba(255,255,255,0.82)}
+        .hr-info .role{font-size:11px;color:rgba(255,255,255,0.3)}
+
+        /* MAIN */
+        .main{flex:1;display:flex;flex-direction:column;min-width:0}
+        .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 30px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+        .topbar-left .page-title{font-family:var(--font-display);font-size:17px;font-weight:600;color:var(--g900)}
+        .topbar-left .greeting{font-size:12px;color:var(--g400);margin-top:1px}
+        .topbar-right{display:flex;align-items:center;gap:10px}
+        .search-box{display:flex;align-items:center;gap:8px;background:var(--g50);border:1px solid var(--border-md);border-radius:8px;padding:7px 12px;width:210px}
+        .search-box input{border:none;background:transparent;font-size:13px;color:var(--g800);outline:none;width:100%;font-family:var(--font)}
+        .search-box svg{width:14px;height:14px;color:var(--g400);flex-shrink:0}
+        .icon-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border-md);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:0.15s;position:relative}
+        .icon-btn:hover{background:var(--g50)}
+        .icon-btn svg{width:16px;height:16px;color:var(--g600)}
+        .notif-dot::after{content:'';position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--r400);border:1.5px solid white}
+
+        /* CONTENT */
+        .content{padding:26px 30px;flex:1}
+
+        /* STATS */
+        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+        .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden;animation:fadeUp 0.4s ease both}
+        .stat-card:nth-child(2){animation-delay:.06s}
+        .stat-card:nth-child(3){animation-delay:.12s}
+        .stat-card:nth-child(4){animation-delay:.18s}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .stat-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+        .stat-icon svg{width:18px;height:18px}
+        .stat-icon.indigo{background:var(--p50)} .stat-icon.indigo svg{color:var(--p600)}
+        .stat-icon.teal{background:var(--s50)} .stat-icon.teal svg{color:var(--s600)}
+        .stat-icon.amber{background:var(--a50)} .stat-icon.amber svg{color:var(--a600)}
+        .stat-icon.red{background:var(--r50)} .stat-icon.red svg{color:var(--r600)}
+        .stat-value{font-family:var(--font-display);font-size:30px;font-weight:700;color:var(--g900);line-height:1}
+        .stat-label{font-size:12px;color:var(--g400);font-weight:500}
+        .stat-delta{font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px}
+        .stat-delta.up{color:var(--s400)} .stat-delta.down{color:var(--r400)}
+        .stat-delta svg{width:12px;height:12px}
+        .stat-card::after{content:'';position:absolute;right:-14px;bottom:-14px;width:70px;height:70px;border-radius:50%;opacity:0.07}
+        .stat-card:nth-child(1)::after{background:var(--p400)}
+        .stat-card:nth-child(2)::after{background:var(--s400)}
+        .stat-card:nth-child(3)::after{background:var(--a400)}
+        .stat-card:nth-child(4)::after{background:var(--r400)}
+
+        /* LAYOUT */
+        .dashboard-body{display:grid;grid-template-columns:1fr 280px;gap:18px;align-items:start}
+
+        /* TABLE */
+        .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+        .section-head h2{font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--g900)}
+        .filters{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+        .filter-pill{padding:5px 13px;border-radius:20px;font-size:12.5px;font-weight:500;border:1px solid var(--border-md);background:var(--surface);color:var(--g600);cursor:pointer;transition:0.15s}
+        .filter-pill:hover{border-color:var(--p400);color:var(--p600)}
+        .filter-pill.active{background:var(--p50);border-color:var(--p400);color:var(--p600)}
+        .btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:0.15s;border:none;font-family:var(--font)}
+        .btn-primary{background:linear-gradient(135deg,var(--p600),var(--p800));color:#fff}
+        .btn-primary:hover{opacity:0.88}
+        .btn-primary svg{width:14px;height:14px}
+
+        .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);animation:fadeUp 0.4s 0.22s ease both}
+        table{width:100%;border-collapse:collapse}
+        thead tr{background:var(--g50);border-bottom:1px solid var(--border)}
+        thead th{padding:11px 14px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--g400)}
+        tbody tr{border-bottom:1px solid var(--border);transition:background 0.12s}
+        tbody tr:last-child{border-bottom:none}
+        tbody tr:hover{background:var(--g50)}
+        tbody td{padding:13px 14px;font-size:13.5px;color:var(--g800);vertical-align:middle}
+
+        .cand-cell{display:flex;align-items:center;gap:10px}
+        .cand-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+        .cand-name{font-weight:600;font-size:13.5px;color:var(--g900)}
+        .cand-email{font-size:11.5px;color:var(--g400);margin-top:1px}
+        .domain-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11.5px;font-weight:500;background:var(--p50);color:var(--p800)}
+        .exp-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11.5px;font-weight:500;background:var(--g100);color:var(--g600)}
+        .status-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}
+        .status-badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+        .status-badge.scheduled{background:var(--p50);color:var(--p800)} .status-badge.scheduled::before{background:var(--p400)}
+        .status-badge.completed{background:var(--s50);color:var(--s600)} .status-badge.completed::before{background:var(--s400)}
+        .status-badge.pending{background:var(--a50);color:var(--a600)} .status-badge.pending::before{background:var(--a400)}
+        .status-badge.cancelled{background:var(--r50);color:var(--r600)} .status-badge.cancelled::before{background:var(--r400)}
+        .date-text{font-size:13px;color:var(--g600)}
+        .time-text{font-size:11.5px;color:var(--g400);margin-top:1px;font-family:var(--font-mono)}
+        .action-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border-md);background:transparent;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:0.12s}
+        .action-btn:hover{background:var(--p50);border-color:var(--p100)}
+        .action-btn svg{width:14px;height:14px;color:var(--g600)}
+        .action-btn:hover svg{color:var(--p600)}
+        .actions-cell{display:flex;gap:5px}
+
+        /* PAGINATION */
+        .pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1px solid var(--border)}
+        .page-info{font-size:12.5px;color:var(--g400)}
+        .page-btns{display:flex;gap:4px}
+        .page-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border-md);background:transparent;display:flex;align-items:center;justify-content:center;font-size:12.5px;cursor:pointer;transition:0.12s;color:var(--g600);font-family:var(--font)}
+        .page-btn:hover{background:var(--g50)}
+        .page-btn.active{background:var(--p600);border-color:var(--p600);color:#fff;font-weight:600}
+
+        /* TODAY PANEL */
+        .today-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;animation:fadeUp 0.4s 0.28s ease both}
+        .today-card h3{font-family:var(--font-display);font-size:14.5px;font-weight:600;margin-bottom:16px;color:var(--g900)}
+        .tl-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+        .tl-item:last-child{border-bottom:none}
+        .tl-time{font-family:var(--font-mono);font-size:11px;color:var(--g400);width:46px;flex-shrink:0;padding-top:3px}
+        .tl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+        .tl-dot.scheduled{background:var(--p400)} .tl-dot.completed{background:var(--s400)} .tl-dot.pending{background:var(--a400)}
+        .tl-body{flex:1}
+        .tl-name{font-size:13px;font-weight:600;color:var(--g900)}
+        .tl-domain{font-size:11.5px;color:var(--g400);margin-top:2px}
+        .mini-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0}
+
+        /* RESPONSIVE */
+        @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr)}.dashboard-body{grid-template-columns:1fr}}
+        @media(max-width:768px){.sidebar{display:none}.content{padding:16px}}
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sb-logo">
+        <div class="brand">TalentDesk</div>
+        <div class="sub">HR Portal</div>
+    </div>
+    <nav class="sb-nav">
+        <div class="nav-label">Main</div>
+        <a class="nav-item active" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+        </a>
+        <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Interviews
+            <span class="nav-badge">12</span>
+        </a>
+        <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Candidates
+        </a>
+        <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            Reports
+        </a>
+        <div class="nav-label">Config</div>
+        <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Settings
+        </a>
+    </nav>
+    <div class="sb-footer">
+        <div class="hr-chip">
+            <div class="avatar">PS</div>
+            <div class="hr-info">
+                <div class="name">Priya Singh</div>
+                <div class="role">HR Manager</div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="page-title">Interview Dashboard</div>
+            <div class="greeting">Good morning, Priya 👋  —  Monday, 21 April 2025</div>
+        </div>
+        <div class="topbar-right">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input type="text" placeholder="Search candidates…" id="searchInput" oninput="filterTable()"/>
+            </div>
+            <div class="icon-btn notif-dot" title="Notifications">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            </div>
+            <div class="avatar" style="cursor:pointer">PS</div>
+        </div>
+    </header>
+
+    <div class="content">
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon indigo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                </div>
+                <div><div class="stat-value">48</div><div class="stat-label">Total Interviews</div></div>
+                <div class="stat-delta up">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
+                    +8 this week
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon teal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                </div>
+                <div><div class="stat-value">31</div><div class="stat-label">Completed</div></div>
+                <div class="stat-delta up">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
+                    64.6% completion rate
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon amber">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </div>
+                <div><div class="stat-value">12</div><div class="stat-label">Scheduled Today</div></div>
+                <div class="stat-delta up">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
+                    3 in next hour
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                </div>
+                <div><div class="stat-value">5</div><div class="stat-label">Cancelled</div></div>
+                <div class="stat-delta down">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+                    10.4% cancellation rate
+                </div>
+            </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="dashboard-body">
+            <!-- TABLE SECTION -->
+            <div>
+                <div class="section-head">
+                    <h2>All Interviews</h2>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                        <div class="filters">
+                            <button class="filter-pill active" onclick="filterStatus('all',this)">All</button>
+                            <button class="filter-pill" onclick="filterStatus('scheduled',this)">Scheduled</button>
+                            <button class="filter-pill" onclick="filterStatus('completed',this)">Completed</button>
+                            <button class="filter-pill" onclick="filterStatus('pending',this)">Pending</button>
+                            <button class="filter-pill" onclick="filterStatus('cancelled',this)">Cancelled</button>
+                        </div>
+                        <button class="btn btn-primary">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Book Interview
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Domain</th>
+                            <th>Experience</th>
+                            <th>Date &amp; Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                    <div class="pagination">
+                        <span class="page-info" id="pageInfo">Showing 1–8 of 14</span>
+                        <div class="page-btns">
+                            <button class="page-btn" onclick="changePage(-1)">&#8249;</button>
+                            <button class="page-btn active" id="p1" onclick="setPage(1)">1</button>
+                            <button class="page-btn" id="p2" onclick="setPage(2)">2</button>
+                            <button class="page-btn" onclick="changePage(1)">&#8250;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TODAY PANEL -->
+            <div class="today-card">
+                <h3>Today's Schedule</h3>
+                <div class="tl-item">
+                    <div class="tl-time">09:00</div>
+                    <div class="tl-dot completed"></div>
+                    <div class="tl-body"><div class="tl-name">Rohan Mehta</div><div class="tl-domain">Frontend Development</div></div>
+                    <div class="mini-av" style="background:#0f6e56">RM</div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-time">10:30</div>
+                    <div class="tl-dot completed"></div>
+                    <div class="tl-body"><div class="tl-name">Sneha Iyer</div><div class="tl-domain">Data Science &amp; ML</div></div>
+                    <div class="mini-av" style="background:#534ab7">SI</div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-time">12:00</div>
+                    <div class="tl-dot scheduled"></div>
+                    <div class="tl-body"><div class="tl-name">Arjun Nair</div><div class="tl-domain">System Design</div></div>
+                    <div class="mini-av" style="background:#534ab7">AN</div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-time">14:00</div>
+                    <div class="tl-dot pending"></div>
+                    <div class="tl-body"><div class="tl-name">Divya Rao</div><div class="tl-domain">Product Management</div></div>
+                    <div class="mini-av" style="background:#854f0b">DR</div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-time">15:30</div>
+                    <div class="tl-dot scheduled"></div>
+                    <div class="tl-body"><div class="tl-name">Karan Bose</div><div class="tl-domain">DevOps &amp; Cloud</div></div>
+                    <div class="mini-av" style="background:#534ab7">KB</div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-time">17:00</div>
+                    <div class="tl-dot scheduled"></div>
+                    <div class="tl-body"><div class="tl-name">Meera Pillai</div><div class="tl-domain">UI / UX Design</div></div>
+                    <div class="mini-av" style="background:#993556">MP</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const COLORS=['#534ab7','#0f6e56','#854f0b','#993c1d','#993556','#185fa5','#3b6d11'];
+    const DATA=[
+        {name:'Ananya Sharma',email:'ananya@example.com',domain:'Frontend Development',exp:'Mid Level',date:'2025-04-21',time:'09:00',status:'completed'},
+        {name:'Rahul Verma',email:'rahul@example.com',domain:'Backend Development',exp:'Senior',date:'2025-04-21',time:'10:30',status:'scheduled'},
+        {name:'Preethi Nair',email:'preethi@example.com',domain:'Data Science & ML',exp:'Junior',date:'2025-04-21',time:'12:00',status:'scheduled'},
+        {name:'Karthik Reddy',email:'karthik@example.com',domain:'DevOps & Cloud',exp:'Lead',date:'2025-04-21',time:'14:00',status:'pending'},
+        {name:'Sanya Kapoor',email:'sanya@example.com',domain:'Full Stack Development',exp:'Mid Level',date:'2025-04-22',time:'09:30',status:'scheduled'},
+        {name:'Vivek Joshi',email:'vivek@example.com',domain:'System Design',exp:'Senior',date:'2025-04-22',time:'11:00',status:'completed'},
+        {name:'Neha Gupta',email:'neha@example.com',domain:'Product Management',exp:'Mid Level',date:'2025-04-22',time:'13:00',status:'cancelled'},
+        {name:'Aditya Kumar',email:'aditya@example.com',domain:'Mobile Development',exp:'Junior',date:'2025-04-22',time:'15:30',status:'scheduled'},
+        {name:'Lakshmi Suresh',email:'lakshmi@example.com',domain:'UI / UX Design',exp:'Senior',date:'2025-04-23',time:'10:00',status:'completed'},
+        {name:'Amit Srivastav',email:'amit@example.com',domain:'Cybersecurity',exp:'Lead',date:'2025-04-23',time:'11:30',status:'scheduled'},
+        {name:'Pooja Menon',email:'pooja@example.com',domain:'QA & Testing',exp:'Junior',date:'2025-04-23',time:'14:00',status:'pending'},
+        {name:'Siddharth Rao',email:'siddharth@example.com',domain:'Finance',exp:'Mid Level',date:'2025-04-24',time:'09:00',status:'scheduled'},
+        {name:'Meena Thomas',email:'meena@example.com',domain:'HR',exp:'Senior',date:'2025-04-24',time:'11:00',status:'completed'},
+        {name:'Gaurav Singh',email:'gaurav@example.com',domain:'Marketing',exp:'Junior',date:'2025-04-24',time:'15:00',status:'cancelled'},
+    ];
+    const PAGE_SIZE=8;
+    let page=1,filter='all',query='';
+
+    function initials(n){return n.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase()}
+    function color(n){let h=0;for(let c of n)h=(h*31+c.charCodeAt(0))%COLORS.length;return COLORS[h]}
+    function fmtDate(d){return new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+    function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+    function filtered(){
+        return DATA.filter(r=>{
+            const ms=filter==='all'||r.status===filter;
+            const q=query.toLowerCase();
+            const mq=!q||r.name.toLowerCase().includes(q)||r.email.toLowerCase().includes(q)||r.domain.toLowerCase().includes(q);
+            return ms&&mq;
+        });
+    }
+
+    function render(){
+        const data=filtered();
+        const start=(page-1)*PAGE_SIZE;
+        const slice=data.slice(start,start+PAGE_SIZE);
+        document.getElementById('tableBody').innerHTML=slice.map(r=>`
+    <tr>
+      <td>
+        <div class="cand-cell"<>>
+          <div class="cand-av</>atar" style="background:${color(r.name)}">${initials(r.name)}</div>
+          <div><div class="cand-name">${r.name}</div><div class="cand-email">${r.email}</div></div>
+        </div>
+      </td>
+      <td><span class="domain-badge">${r.domain}</span></td>
+      <td><span class="exp-badge">${r.exp}</span></td>
+      <td><div class="date-text">${fmtDate(r.date)}</div><div class="time-text">${r.time}</div></td>
+      <td><span class="status-badge ${r.status}">${cap(r.status)}</span></td>
+      <td>
+        <div class="actions-cell">
+          <button class="action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          <button class="action-btn" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="action-btn" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+        </div>
+      </td>
+    </tr>`).join('');
+        const total=data.length;
+        const s=start+1,e=Math.min(start+PAGE_SIZE,total);
+        document.getElementById('pageInfo').textContent=`Showing ${s}–${Math.max(s-1,e)} of ${total}`;
+        const totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+        document.getElementById('p1').className='page-btn'+(page===1?' active':'');
+        document.getElementById('p2').className='page-btn'+(page===2?' active':'');
+        document.getElementById('p2').style.display=totalPages<2?'none':'flex';
+    }
+
+    function filterStatus(s,el){filter=s;page=1;document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');render()}
+    function filterTable(){query=document.getElementById('searchInput').value;page=1;render()}
+    function changePage(d){const t=Math.max(1,Math.ceil(filtered().length/PAGE_SIZE));page=Math.max(1,Math.min(page+d,t));render()}
+    function setPage(p){page=p;render()}
+
+    render();
+</script>
+</body>
+</html>

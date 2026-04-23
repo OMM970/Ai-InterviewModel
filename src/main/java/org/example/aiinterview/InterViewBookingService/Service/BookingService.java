@@ -2,6 +2,7 @@ package org.example.aiinterview.InterViewBookingService.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.aiinterview.InterViewBookingService.Dtos.MailDto;
 import org.example.aiinterview.InterViewBookingService.Dtos.booking_RequestDto;
 import org.example.aiinterview.InterViewBookingService.Dtos.booking_ResponseDto;
 import org.example.aiinterview.InterViewBookingService.Entitiy.BookingEntity;
@@ -10,6 +11,7 @@ import org.example.aiinterview.InterViewBookingService.Enums.Interview_Status;
 import org.example.aiinterview.InterViewBookingService.Enums.Interview_domain;
 import org.example.aiinterview.InterViewBookingService.Repository.BookingRepositroy;
 import org.example.aiinterview.InterViewBookingService.Repository.Credential_Repo;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,7 @@ public class BookingService implements BookingServiceImpl {
     private final PasswordEncoder passwordEncoder;
     private final Credential_Repo  credential_repo;
     private final CredentialGeneratorService credentialGeneratorService;
+    private final ApplicationEventPublisher publisher;
 
 
     @Override
@@ -80,7 +83,7 @@ public class BookingService implements BookingServiceImpl {
         LocalDateTime expiryTime = bookingRequestDto.getInterviewDateTime().plusHours(24);
 
         credentialGeneratorService.saveInterviewId(interviewId,hashedPassword,expiryTime);
-        log.info("Credentila saved to Reedis Sucessfullt"+interviewId);
+        log.info("Credential saved to Redis Sucessfull"+interviewId);
 
 
         credentialEntity.setExpiresAt(
@@ -92,6 +95,17 @@ public class BookingService implements BookingServiceImpl {
         credential_repo.save(credentialEntity);
 
         bookingEntity = bookingRepositroy.save(bookingEntity);
+        MailDto mailDto = new MailDto(
+                interviewId,
+                bookingEntity.getEmail(),
+                bookingEntity.getFullName(),
+                bookingEntity.getInterview_Domain().toString(),
+                bookingEntity.getInterviewDateTime().toString(),
+                rawPassword
+        );
+
+
+        publisher.publishEvent(mailDto);
 
         return maptoDto(bookingEntity, interviewId);
     }
