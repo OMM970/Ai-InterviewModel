@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Interview Confirmation</title>
+</head>
+<body style="margin:0;padding:0;background:#f0efec;font-family:'Segoe UI',Arial,sans-serif">
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0efec;padding:40px 0">
+    <tr>
+        <td align="center">
+
+            <!-- CARD -->
+            <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">
+
+                <!-- HEADER BANNER -->
+                <tr>
+                    <td style="background:linear-gradient(135deg,#534ab7 0%,#3c3489 100%);padding:40px 40px 36px">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td>
+                                    <!-- Logo wordmark -->
+                                    <p style="margin:0 0 24px;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:-0.3px">TalentDesk</p>
+                                    <!-- Icon circle -->
+                                    <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px">
+                                        <tr>
+                                            <td style="width:56px;height:56px;background:rgba(255,255,255,0.15);border-radius:50%;text-align:center;vertical-align:middle;font-size:26px">
+                                                &#128197;
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <p style="margin:0 0 6px;font-size:26px;font-weight:700;color:#ffffff;line-height:1.2">Interview Confirmed!</p>
+                                    <p style="margin:0;font-size:14px;color:rgba(255,255,255,0.72);line-height:1.5">Your interview has been successfully scheduled. Please find the details below.</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- GREETING -->
+                <tr>
+                    <td style="padding:32px 40px 0">
+                        <p style="margin:0;font-size:15px;color:#2a2825;line-height:1.6">
+                            Dear <strong style="color:#534ab7"><span th:text="${candidateName}"></span></strong>,
+                        </p>
+                        <p style="margin:12px 0 0;font-size:14.5px;color:#635f58;line-height:1.7">
+                            We are pleased to confirm your upcoming interview with us. Please review the details carefully and make sure to join on time. Best of luck!
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- DETAILS CARD -->
+                <tr>
+                    <td style="padding:24px 40px 0">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8f7f4;border-radius:12px;border:1px solid rgba(28,27,25,0.09);overflow:hidden">
+
+                            <tr>
+                                <td colspan="2" style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,25,0.08)">
+                                    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#9e9b94">Interview Details</p>
+                                </td>
+                            </tr>
+
+                            <!-- Name -->
+                            <tr style="border-bottom:1px solid rgba(28,27,25,0.08)">
+                                <td style="padding:14px 20px;width:44%;border-bottom:1px solid rgba(28,27,25,0.08)">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="width:28px;vertical-align:middle;font-size:16px">&#128100;</td>
+                                            <td style="font-size:12.5px;font-weight:600;color:#9e9b94;text-transform:uppercase;letter-spacing:0.6px;padding-left:6px">Candidate Name</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="padding:14px 20px;border-bottom:1px solid rgba(28,27,25,0.08)">
+                                    <p style="margin:0;font-size:14px;font-weight:600;color:#1a1917"><span th:text="${candidateName}"></span></p>
+                                </td>
+                            </tr>
+
+                            <!-- Domain -->
+                            <tr>
+                                <td style="padding:14px 20px;border-bottom:1px solid rgba(28,27,25,0.08)">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="width:28px;vertical-align:middle;font-size:16px">&#128188;</td>
+                                            <td style="font-size:12.5px;font-weight:600;color:#9e9b94;text-transform:uppercase;letter-spacing:0.6px;padding-left:6px">Interview Domain</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="padding:14px 20px;border-bottom:1px solid rgba(28,27,25,0.08)">
+                                    <span style="display:inline-block;background:#eeedfe;color:#3c3489;font-size:12.5px;font-weight:600;padding:4px 12px;border-radius:6px"><span th:text="${interviewDomain}"></span></span>
+                                </td>
+                            </tr>
+
+                            <!-- Date & Time -->
+                            <tr>
+                                <td style="padding:14px 20px;border-bottom:1px solid rgba(28,27,25,0.08)">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="width:28px;vertical-align:middle;font-size:16px">&#128336;</td>
+                                            <td style="font-size:12.5px;font-weight:600;color:#9e9b94;text-transform:uppercase;letter-spacing:0.6px;padding-left:6px">Date &amp; Time</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="padding:14px 20px;border-bottom:1px solid rgba(28,27,25,0.08)">
+                                    <p style="margin:0;font-size:14px;font-weight:600;color:#1a1917"><span th:text="${interviewDateTime}"></span></p>
+                                </td>
+                            </tr>
+
+                            <!-- Interview ID -->
+                            <tr>
+                                <td style="padding:14px 20px;border-bottom:1px solid rgba(28,27,25,0.08)">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="width:28px;vertical-align:middle;font-size:16px">&#127381;</td>
+                                            <td style="font-size:12.5px;font-weight:600;color:#9e9b94;text-transform:uppercase;letter-spacing:0.6px;padding-left:6px">Interview ID</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="padding:14px 20px;border-bottom:1px solid rgba(28,27,25,0.08)">
+                                    <span style="font-family:'Courier New',monospace;font-size:13.5px;font-weight:700;color:#534ab7;background:#eeedfe;padding:4px 12px;border-radius:6px;display:inline-block;letter-spacing:1px"><span th:text="${interviewId}"></span></span>
+                                </td>
+                            </tr>
+
+                            <!-- Password -->
+                            <tr>
+                                <td style="padding:14px 20px">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="width:28px;vertical-align:middle;font-size:16px">&#128274;</td>
+                                            <td style="font-size:12.5px;font-weight:600;color:#9e9b94;text-transform:uppercase;letter-spacing:0.6px;padding-left:6px">Access Password</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="padding:14px 20px">
+                                    <span style="font-family:'Courier New',monospace;font-size:15px;font-weight:700;color:#1a1917;background:#ffffff;border:1.5px dashed #7f77dd;padding:6px 16px;border-radius:8px;display:inline-block;letter-spacing:2px"><span th:text="${password}"></span></span>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- PASSWORD WARNING -->
+                <tr>
+                    <td style="padding:20px 40px 0">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#faeeda;border-radius:10px;border-left:4px solid #ba7517">
+                            <tr>
+                                <td style="padding:14px 16px">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="font-size:18px;vertical-align:top;padding-right:10px">&#9888;&#65039;</td>
+                                            <td>
+                                                <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#854f0b">Important — Password Expiry</p>
+                                                <p style="margin:0;font-size:13px;color:#854f0b;line-height:1.6">This password is valid only for your interview day and will <strong>expire at 11:59 PM</strong> on the scheduled date. Do not share it with anyone.</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- TIPS -->
+                <tr>
+                    <td style="padding:24px 40px 0">
+                        <p style="margin:0 0 12px;font-size:13px;font-weight:700;color:#2a2825;text-transform:uppercase;letter-spacing:0.8px">Before Your Interview</p>
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="padding:6px 0">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="width:22px;font-size:14px;vertical-align:top">&#9989;</td>
+                                            <td style="font-size:13.5px;color:#635f58;padding-left:8px;line-height:1.6">Keep your Interview ID and password handy before joining.</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:6px 0">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="width:22px;font-size:14px;vertical-align:top">&#9989;</td>
+                                            <td style="font-size:13.5px;color:#635f58;padding-left:8px;line-height:1.6">Join at least 5 minutes before your scheduled time.</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:6px 0">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="width:22px;font-size:14px;vertical-align:top">&#9989;</td>
+                                            <td style="font-size:13.5px;color:#635f58;padding-left:8px;line-height:1.6">Ensure a stable internet connection and a quiet environment.</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:6px 0">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="width:22px;font-size:14px;vertical-align:top">&#9989;</td>
+                                            <td style="font-size:13.5px;color:#635f58;padding-left:8px;line-height:1.6">Have your resume and any relevant documents ready.</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- DIVIDER -->
+                <tr>
+                    <td style="padding:28px 40px 0">
+                        <hr style="border:none;border-top:1px solid rgba(28,27,25,0.09);margin:0"/>
+                    </td>
+                </tr>
+
+                <!-- CLOSING -->
+                <tr>
+                    <td style="padding:24px 40px 32px">
+                        <p style="margin:0 0 6px;font-size:14.5px;color:#635f58;line-height:1.7">
+                            We wish you all the best for your interview. If you have any questions or need to reschedule, please contact our HR team.
+                        </p>
+                        <p style="margin:16px 0 0;font-size:14px;color:#2a2825">Warm regards,</p>
+                        <p style="margin:4px 0 0;font-size:15px;font-weight:700;color:#534ab7">TalentDesk HR Team</p>
+                    </td>
+                </tr>
+
+                <!-- FOOTER -->
+                <tr>
+                    <td style="background:#f8f7f4;border-top:1px solid rgba(28,27,25,0.08);padding:20px 40px;text-align:center;border-radius:0 0 16px 16px">
+                        <p style="margin:0 0 6px;font-size:12px;color:#9e9b94">This is an automated email. Please do not reply directly to this message.</p>
+                        <p style="margin:0;font-size:12px;color:#b0aea6">&copy; 2025 TalentDesk. All rights reserved.</p>
+                    </td>
+                </tr>
+
+            </table>
+            <!-- END CARD -->
+
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
