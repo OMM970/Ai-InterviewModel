@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>AI Interview Room</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+        :root{
+            --bg:#0f0f10;
+            --surface:#1a1a1d;
+            --surface2:#222226;
+            --surface3:#2a2a2f;
+            --border:rgba(255,255,255,0.07);
+            --border-md:rgba(255,255,255,0.12);
+            --p400:#7f77dd;
+            --p500:#6b63d4;
+            --p600:#534ab7;
+            --p-glow:rgba(127,119,221,0.35);
+            --green:#22c55e;
+            --green-dim:rgba(34,197,94,0.15);
+            --red:#ef4444;
+            --amber:#f59e0b;
+            --text:#f4f3ff;
+            --text-dim:rgba(244,243,255,0.5);
+            --text-muted:rgba(244,243,255,0.28);
+            --font:'Plus Jakarta Sans',sans-serif;
+            --mono:'JetBrains Mono',monospace;
+        }
+
+        body{
+            font-family:var(--font);
+            background:var(--bg);
+            color:var(--text);
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+            overflow:hidden;
+        }
+
+        /* ── TOP BAR ── */
+        .topbar{
+            display:flex;align-items:center;justify-content:space-between;
+            padding:12px 20px;
+            background:rgba(15,15,16,0.9);
+            border-bottom:1px solid var(--border);
+            backdrop-filter:blur(12px);
+            z-index:20;
+            flex-shrink:0;
+        }
+
+        .tb-left{display:flex;align-items:center;gap:14px}
+        .logo{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--p400);letter-spacing:0.5px}
+        .tb-divider{width:1px;height:18px;background:var(--border-md)}
+        .interview-info{display:flex;flex-direction:column;gap:1px}
+        .interview-title{font-size:13px;font-weight:600;color:var(--text)}
+        .interview-sub{font-size:11px;color:var(--text-muted);font-family:var(--mono)}
+
+        .tb-center{display:flex;align-items:center;gap:8px}
+        .timer{
+            font-family:var(--mono);font-size:13px;font-weight:600;
+            color:var(--text-dim);background:var(--surface);
+            border:1px solid var(--border);padding:5px 12px;border-radius:6px;
+            letter-spacing:1px;
+        }
+        .rec-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse-red 1.2s ease-in-out infinite}
+        @keyframes pulse-red{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(239,68,68,0.5)}50%{opacity:0.7;box-shadow:0 0 0 4px rgba(239,68,68,0)}}
+
+        .tb-right{display:flex;align-items:center;gap:8px}
+        .status-pill{
+            display:flex;align-items:center;gap:6px;
+            padding:5px 12px;border-radius:20px;
+            font-size:12px;font-weight:600;
+            background:var(--green-dim);color:var(--green);
+            border:1px solid rgba(34,197,94,0.2);
+        }
+        .status-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse-green 2s ease-in-out infinite}
+        @keyframes pulse-green{0%,100%{opacity:1}50%{opacity:0.4}}
+        .candidate-chip{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:20px;background:var(--surface2);border:1px solid var(--border)}
+        .chip-avatar{width:26px;height:26px;border-radius:50%;background:var(--p600);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+        .chip-name{font-size:12px;font-weight:500;color:var(--text-dim)}
+
+        /* ── MAIN STAGE ── */
+        .stage{
+            flex:1;display:grid;
+            grid-template-columns:1fr 340px;
+            grid-template-rows:1fr;
+            gap:0;
+            overflow:hidden;
+        }
+
+        /* ── VIDEO AREA ── */
+        .video-area{
+            display:grid;
+            grid-template-rows:1fr auto;
+            gap:12px;
+            padding:16px;
+            position:relative;
+            background:var(--bg);
+            overflow:hidden;
+        }
+
+        /* AI MAIN TILE */
+        .ai-tile{
+            position:relative;
+            background:var(--surface);
+            border-radius:16px;
+            overflow:hidden;
+            border:1px solid var(--border);
+            display:flex;align-items:center;justify-content:center;
+            flex-direction:column;gap:0;
+        }
+
+        .ai-tile.speaking{
+            border-color:var(--p400);
+            box-shadow:0 0 0 2px var(--p400), 0 0 40px var(--p-glow);
+        }
+
+        /* Animated AI visual */
+        .ai-visual{
+            display:flex;flex-direction:column;align-items:center;justify-content:center;
+            gap:24px;width:100%;height:100%;padding:32px;
+            position:relative;
+        }
+
+        .ai-orb{
+            position:relative;
+            width:140px;height:140px;
+        }
+
+        .orb-core{
+            width:140px;height:140px;border-radius:50%;
+            background:radial-gradient(circle at 35% 35%, #8b84e8, #534ab7 60%, #2a2470);
+            box-shadow:0 0 60px rgba(127,119,221,0.4), 0 0 120px rgba(83,74,183,0.2);
+            display:flex;align-items:center;justify-content:center;
+            position:relative;z-index:2;
+        }
+
+        .orb-core svg{width:52px;height:52px;color:rgba(255,255,255,0.9)}
+
+        .orb-ring{
+            position:absolute;inset:-12px;border-radius:50%;
+            border:1.5px solid rgba(127,119,221,0.3);
+            animation:orbit 3s linear infinite;
+        }
+        .orb-ring2{
+            position:absolute;inset:-24px;border-radius:50%;
+            border:1px solid rgba(127,119,221,0.15);
+            animation:orbit 5s linear infinite reverse;
+        }
+        .orb-ring3{
+            position:absolute;inset:-38px;border-radius:50%;
+            border:1px dashed rgba(127,119,221,0.08);
+            animation:orbit 8s linear infinite;
+        }
+
+        @keyframes orbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+        /* Speaking animation */
+        .ai-tile.speaking .orb-core{animation:orb-pulse 0.6s ease-in-out infinite alternate}
+        @keyframes orb-pulse{
+            from{box-shadow:0 0 40px rgba(127,119,221,0.4),0 0 80px rgba(83,74,183,0.2);transform:scale(1)}
+            to{box-shadow:0 0 80px rgba(127,119,221,0.7),0 0 140px rgba(83,74,183,0.4);transform:scale(1.04)}
+        }
+
+        .ai-label{
+            text-align:center;
+        }
+        .ai-label .name{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+        .ai-label .role{font-size:13px;color:var(--text-muted);font-family:var(--mono)}
+
+        /* Sound wave bars */
+        .sound-wave{
+            display:flex;align-items:center;gap:3px;height:28px;
+            opacity:0;transition:opacity 0.3s;
+        }
+        .ai-tile.speaking .sound-wave{opacity:1}
+        .bar{
+            width:3px;border-radius:3px;background:var(--p400);
+            animation:wave 0.8s ease-in-out infinite alternate;
+        }
+        .bar:nth-child(1){height:8px;animation-delay:0s}
+        .bar:nth-child(2){height:16px;animation-delay:0.1s}
+        .bar:nth-child(3){height:24px;animation-delay:0.2s}
+        .bar:nth-child(4){height:18px;animation-delay:0.3s}
+        .bar:nth-child(5){height:28px;animation-delay:0.15s}
+        .bar:nth-child(6){height:22px;animation-delay:0.25s}
+        .bar:nth-child(7){height:14px;animation-delay:0.05s}
+        .bar:nth-child(8){height:20px;animation-delay:0.35s}
+        .bar:nth-child(9){height:10px;animation-delay:0.12s}
+
+        @keyframes wave{from{transform:scaleY(0.4)}to{transform:scaleY(1)}}
+
+        /* AI name overlay bottom left */
+        .tile-label{
+            position:absolute;bottom:14px;left:14px;
+            display:flex;align-items:center;gap:8px;
+            background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);
+            padding:6px 12px;border-radius:8px;
+            font-size:12.5px;font-weight:600;color:var(--text);
+            border:1px solid rgba(255,255,255,0.08);
+        }
+        .tile-label .tl-dot{width:7px;height:7px;border-radius:50%;background:var(--p400)}
+        .ai-tile.speaking .tile-label .tl-dot{animation:pulse-green 0.8s ease-in-out infinite}
+
+        /* Question overlay */
+        .question-overlay{
+            position:absolute;bottom:60px;left:50%;transform:translateX(-50%);
+            background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);
+            border:1px solid rgba(127,119,221,0.3);
+            border-radius:12px;padding:14px 20px;max-width:520px;width:90%;
+            text-align:center;
+        }
+        .q-label{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--p400);margin-bottom:6px}
+        .q-text{font-size:14px;color:var(--text);line-height:1.6;font-weight:500}
+
+        /* CANDIDATE TILE ROW */
+        .candidate-row{
+            display:flex;gap:12px;
+        }
+
+        .candidate-tile{
+            flex:1;
+            position:relative;
+            background:var(--surface);
+            border-radius:12px;
+            overflow:hidden;
+            border:1px solid var(--border);
+            height:130px;
+            display:flex;align-items:center;justify-content:center;
+        }
+        .candidate-tile.speaking-candidate{
+            border-color:var(--green);
+            box-shadow:0 0 0 2px var(--green), 0 0 20px rgba(34,197,94,0.2);
+        }
+
+        .cam-off{
+            display:flex;flex-direction:column;align-items:center;gap:8px;
+        }
+        .cam-avatar{
+            width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#3a3580,#534ab7);
+            display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;
+        }
+        .cam-name{font-size:12px;font-weight:500;color:var(--text-dim)}
+
+        .cam-tile-label{
+            position:absolute;bottom:8px;left:8px;
+            display:flex;align-items:center;gap:6px;
+            background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);
+            padding:4px 9px;border-radius:6px;
+            font-size:11px;font-weight:500;color:var(--text);
+        }
+        .muted-icon{
+            position:absolute;top:8px;right:8px;
+            width:24px;height:24px;border-radius:50%;
+            background:rgba(239,68,68,0.85);
+            display:flex;align-items:center;justify-content:center;
+        }
+        .muted-icon svg{width:12px;height:12px;color:#fff}
+
+        /* ── SIDE PANEL ── */
+        .side-panel{
+            background:var(--surface);
+            border-left:1px solid var(--border);
+            display:flex;flex-direction:column;
+            overflow:hidden;
+        }
+
+        .panel-tabs{
+            display:flex;border-bottom:1px solid var(--border);flex-shrink:0;
+        }
+        .tab{
+            flex:1;padding:13px 8px;text-align:center;font-size:12.5px;font-weight:600;
+            color:var(--text-muted);cursor:pointer;transition:0.15s;border-bottom:2px solid transparent;
+            position:relative;
+        }
+        .tab:hover{color:var(--text-dim)}
+        .tab.active{color:var(--p400);border-bottom-color:var(--p400)}
+        .tab-badge{
+            display:inline-flex;align-items:center;justify-content:center;
+            width:16px;height:16px;border-radius:50%;background:var(--p600);
+            color:#fff;font-size:9px;font-weight:700;margin-left:5px;vertical-align:middle;
+        }
+
+        /* TRANSCRIPT TAB */
+        .panel-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+        .panel-body::-webkit-scrollbar{width:4px}
+        .panel-body::-webkit-scrollbar-track{background:transparent}
+        .panel-body::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:2px}
+
+        .msg{display:flex;flex-direction:column;gap:4px;animation:msgIn 0.25s ease}
+        @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        .msg-who{font-size:10.5px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase}
+        .msg-who.ai{color:var(--p400)}
+        .msg-who.user{color:var(--green)}
+        .msg-bubble{
+            background:var(--surface2);border-radius:10px;padding:10px 13px;
+            font-size:13px;color:var(--text-dim);line-height:1.65;
+            border:1px solid var(--border);
+        }
+        .msg.ai-msg .msg-bubble{border-color:rgba(127,119,221,0.18);background:rgba(83,74,183,0.08)}
+        .msg-time{font-size:10px;color:var(--text-muted);font-family:var(--mono)}
+
+        /* QUESTIONS TAB */
+        .q-list{display:flex;flex-direction:column;gap:8px}
+        .q-item{
+            display:flex;align-items:flex-start;gap:10px;
+            padding:12px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);
+        }
+        .q-num{
+            width:22px;height:22px;border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;
+        }
+        .q-num.done{background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.2)}
+        .q-num.current{background:rgba(127,119,221,0.2);color:var(--p400);border:1px solid rgba(127,119,221,0.3)}
+        .q-num.upcoming{background:var(--surface3);color:var(--text-muted);border:1px solid var(--border)}
+        .q-content .q-domain{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:3px}
+        .q-content .q-txt{font-size:12.5px;color:var(--text-dim);line-height:1.55}
+        .q-item.current-q{border-color:rgba(127,119,221,0.3);background:rgba(83,74,183,0.06)}
+        .q-item.done-q .q-txt{color:var(--text-muted)}
+
+        /* NOTES TAB */
+        .notes-area{
+            flex:1;display:flex;flex-direction:column;gap:10px;padding:16px;
+        }
+        .notes-textarea{
+            flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+            color:var(--text);font-size:13px;font-family:var(--font);line-height:1.7;
+            padding:14px;resize:none;outline:none;min-height:200px;
+        }
+        .notes-textarea:focus{border-color:rgba(127,119,221,0.35)}
+        .notes-textarea::placeholder{color:var(--text-muted)}
+        .notes-save{
+            padding:10px;border-radius:8px;border:none;
+            background:var(--p600);color:#fff;font-size:13px;font-weight:600;cursor:pointer;
+            font-family:var(--font);transition:0.15s;
+        }
+        .notes-save:hover{background:var(--p500)}
+
+        /* ── BOTTOM CONTROLS ── */
+        .controls{
+            padding:14px 24px;
+            background:rgba(15,15,16,0.95);
+            border-top:1px solid var(--border);
+            backdrop-filter:blur(12px);
+            display:flex;align-items:center;justify-content:center;
+            gap:12px;
+            flex-shrink:0;
+            position:relative;
+        }
+
+        .ctrl-group{display:flex;align-items:center;gap:8px}
+
+        .ctrl-btn{
+            display:flex;flex-direction:column;align-items:center;gap:5px;
+            cursor:pointer;
+            transition:transform 0.15s;
+            background:none;border:none;font-family:var(--font);
+        }
+        .ctrl-btn:hover{transform:translateY(-2px)}
+        .ctrl-btn:hover .btn-icon{border-color:rgba(255,255,255,0.2)}
+
+        .btn-icon{
+            width:48px;height:48px;border-radius:50%;
+            background:var(--surface2);border:1px solid var(--border);
+            display:flex;align-items:center;justify-content:center;
+            transition:0.15s;
+        }
+        .btn-icon svg{width:20px;height:20px;color:var(--text)}
+        .btn-icon.active{background:var(--surface3)}
+        .btn-icon.danger{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.25)}
+        .btn-icon.danger svg{color:var(--red)}
+        .btn-icon.muted-state{background:rgba(239,68,68,0.85);border-color:rgba(239,68,68,0.5)}
+        .btn-icon.muted-state svg{color:#fff}
+        .btn-label{font-size:10.5px;color:var(--text-muted);font-weight:500}
+
+        .ctrl-divider{width:1px;height:36px;background:var(--border);margin:0 4px}
+
+        /* End call button */
+        .end-btn{
+            display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;
+            background:none;border:none;font-family:var(--font);transition:transform 0.15s;
+        }
+        .end-btn:hover{transform:translateY(-2px)}
+        .end-icon{
+            width:56px;height:56px;border-radius:50%;
+            background:var(--red);
+            display:flex;align-items:center;justify-content:center;
+            box-shadow:0 4px 16px rgba(239,68,68,0.35);
+            transition:0.15s;
+        }
+        .end-btn:hover .end-icon{background:#dc2626;box-shadow:0 6px 20px rgba(239,68,68,0.5)}
+        .end-icon svg{width:22px;height:22px;color:#fff}
+        .end-label{font-size:10.5px;color:var(--red);font-weight:600}
+
+        /* Bottom right info */
+        .controls-info{
+            position:absolute;right:24px;top:50%;transform:translateY(-50%);
+            display:flex;align-items:center;gap:6px;
+        }
+        .info-pill{
+            display:flex;align-items:center;gap:5px;
+            padding:4px 10px;border-radius:6px;
+            background:var(--surface2);border:1px solid var(--border);
+            font-size:11px;color:var(--text-muted);font-family:var(--mono);
+        }
+        .info-pill svg{width:12px;height:12px}
+
+        /* ── NOTIFICATION TOAST ── */
+        .toast{
+            position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-10px);
+            background:var(--surface2);border:1px solid var(--border-md);
+            padding:10px 18px;border-radius:10px;
+            font-size:13px;color:var(--text-dim);
+            backdrop-filter:blur(12px);
+            opacity:0;transition:all 0.3s;
+            pointer-events:none;z-index:100;
+            display:flex;align-items:center;gap:8px;
+        }
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+        .toast-dot{width:7px;height:7px;border-radius:50%;background:var(--p400)}
+
+        /* Panel tabs content */
+        .tab-content{display:none;flex:1;overflow:hidden;flex-direction:column}
+        .tab-content.active{display:flex}
+
+        /* Progress bar */
+        .progress-bar{
+            height:2px;background:var(--surface3);flex-shrink:0;
+        }
+        .progress-fill{
+            height:100%;background:linear-gradient(90deg,var(--p600),var(--p400));
+            width:40%;transition:width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="tb-left">
+        <div class="logo">TalentDesk AI</div>
+        <div class="tb-divider"></div>
+        <div class="interview-info">
+            <div class="interview-title">Frontend Development Interview</div>
+            <div class="interview-sub">ID: TDK-2025-04F3 &nbsp;·&nbsp; Mid Level</div>
+        </div>
+    </div>
+    <div class="tb-center">
+        <div class="rec-dot"></div>
+        <div class="timer" id="timer">00:12:34</div>
+    </div>
+    <div class="tb-right">
+        <div class="status-pill">
+            <div class="dot"></div>
+            Live
+        </div>
+        <div class="candidate-chip">
+            <div class="chip-avatar">OM</div>
+            <div class="chip-name">Om Narayan Mishra</div>
+        </div>
+    </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<!-- STAGE -->
+<div class="stage">
+
+    <!-- VIDEO AREA -->
+    <div class="video-area">
+
+        <!-- AI MAIN TILE -->
+        <div class="ai-tile speaking" id="aiTile">
+            <div class="ai-visual">
+                <div class="ai-orb">
+                    <div class="orb-ring3"></div>
+                    <div class="orb-ring2"></div>
+                    <div class="orb-ring"></div>
+                    <div class="orb-core">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 2a4 4 0 014 4v4a4 4 0 01-8 0V6a4 4 0 014-4z"/>
+                            <path d="M3 14a9 9 0 0018 0"/>
+                            <path d="M8 21h8M12 18v3"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ai-label">
+                    <div class="name">ARIA</div>
+                    <div class="role">AI Interviewer · TalentDesk</div>
+                </div>
+                <div class="sound-wave">
+                    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                </div>
+            </div>
+
+            <div class="tile-label">
+                <div class="tl-dot"></div>
+                ARIA — AI Interviewer
+            </div>
+
+            <!-- Current question overlay -->
+            <div class="question-overlay" id="qOverlay">
+                <div class="q-label">Current Question</div>
+                <div class="q-text" id="qOverlayText">Can you explain the difference between CSS Flexbox and Grid, and when you'd choose one over the other?</div>
+            </div>
+        </div>
+
+        <!-- CANDIDATE TILES ROW -->
+        <div class="candidate-row">
+
+            <!-- Candidate main tile -->
+            <div class="candidate-tile" id="candidateTile" style="flex:2;height:130px">
+                <div class="cam-off">
+                    <div class="cam-avatar" style="width:56px;height:56px;font-size:20px">OM</div>
+                    <div class="cam-name">Om Narayan Mishra</div>
+                </div>
+                <div class="cam-tile-label">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                    Camera Off
+                </div>
+                <div class="muted-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 005.12 2.12M15 9.34V4a3 3 0 00-5.94-.6"/><path d="M17 16.95A7 7 0 015 12v-2m14 0v2a7 7 0 01-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                </div>
+            </div>
+
+            <!-- Stats mini tile -->
+            <div class="candidate-tile" style="width:160px;flex:none;padding:14px">
+                <div style="width:100%">
+                    <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Session</div>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <span style="font-size:11px;color:var(--text-muted)">Questions</span>
+                            <span style="font-size:12px;font-weight:700;color:var(--text);font-family:var(--mono)">2 / 5</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <span style="font-size:11px;color:var(--text-muted)">Answered</span>
+                            <span style="font-size:12px;font-weight:700;color:var(--green);font-family:var(--mono)">1</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <span style="font-size:11px;color:var(--text-muted)">Pending</span>
+                            <span style="font-size:12px;font-weight:700;color:var(--amber);font-family:var(--mono)">3</span>
+                        </div>
+                        <div style="height:1px;background:var(--border);margin:2px 0"></div>
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <span style="font-size:11px;color:var(--text-muted)">Difficulty</span>
+                            <span style="font-size:11px;font-weight:600;color:var(--amber)">Medium</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SIDE PANEL -->
+    <div class="side-panel">
+
+        <!-- Tabs -->
+        <div class="panel-tabs">
+            <div class="tab active" onclick="switchTab('transcript',this)">
+                Transcript <span class="tab-badge" id="msgCount">4</span>
+            </div>
+            <div class="tab" onclick="switchTab('questions',this)">Questions</div>
+            <div class="tab" onclick="switchTab('notes',this)">Notes</div>
+        </div>
+
+        <!-- TRANSCRIPT -->
+        <div class="tab-content active" id="tab-transcript">
+            <div class="panel-body" id="transcriptBody">
+
+                <div class="msg ai-msg">
+                    <div class="msg-who ai">ARIA — AI Interviewer</div>
+                    <div class="msg-bubble">Hello Om! Welcome to your Frontend Development interview with TalentDesk. I'm ARIA, your AI interviewer today. Let's begin with a warm-up question.</div>
+                    <div class="msg-time">10:04 AM</div>
+                </div>
+
+                <div class="msg">
+                    <div class="msg-who user">Om Narayan Mishra</div>
+                    <div class="msg-bubble">Thank you! I'm ready to begin.</div>
+                    <div class="msg-time">10:04 AM</div>
+                </div>
+
+                <div class="msg ai-msg">
+                    <div class="msg-who ai">ARIA — AI Interviewer</div>
+                    <div class="msg-bubble">Great! My first question: Can you walk me through how the browser renders a webpage, specifically the critical rendering path from HTML parsing to pixels on screen?</div>
+                    <div class="msg-time">10:05 AM</div>
+                </div>
+
+                <div class="msg">
+                    <div class="msg-who user">Om Narayan Mishra</div>
+                    <div class="msg-bubble">Sure. The browser starts by parsing the HTML to build the DOM tree, then parses CSS to build the CSSOM. These two are combined to form the Render Tree. After layout, the browser paints the pixels to screen. JavaScript can block this process if it's not deferred or async.</div>
+                    <div class="msg-time">10:07 AM</div>
+                </div>
+
+                <div class="msg ai-msg" id="currentAiMsg">
+                    <div class="msg-who ai">ARIA — AI Interviewer</div>
+                    <div class="msg-bubble" id="typingBubble">
+                        <span id="typingText"></span><span class="typing-cursor" style="display:inline-block;width:2px;height:13px;background:var(--p400);margin-left:2px;animation:blink 0.8s infinite;vertical-align:middle"></span>
+                    </div>
+                    <div class="msg-time">10:16 AM</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- QUESTIONS -->
+        <div class="tab-content" id="tab-questions">
+            <div class="panel-body">
+                <div class="q-list">
+                    <div class="q-item done-q">
+                        <div class="q-num done">✓</div>
+                        <div class="q-content">
+                            <div class="q-domain">Browser Fundamentals</div>
+                            <div class="q-txt">Walk me through the browser's critical rendering path from HTML to pixels.</div>
+                        </div>
+                    </div>
+                    <div class="q-item current-q">
+                        <div class="q-num current">2</div>
+                        <div class="q-content">
+                            <div class="q-domain">CSS Layout</div>
+                            <div class="q-txt">Explain the difference between Flexbox and Grid, and when to use each.</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <div class="q-num upcoming">3</div>
+                        <div class="q-content">
+                            <div class="q-domain">JavaScript</div>
+                            <div class="q-txt">What is the event loop in JavaScript and how does it handle async operations?</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <div class="q-num upcoming">4</div>
+                        <div class="q-content">
+                            <div class="q-domain">React</div>
+                            <div class="q-txt">Explain the difference between controlled and uncontrolled components in React.</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <div class="q-num upcoming">5</div>
+                        <div class="q-content">
+                            <div class="q-domain">Performance</div>
+                            <div class="q-txt">How would you optimize a React app that feels slow on initial load?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="tab-content" id="tab-notes">
+            <div class="notes-area">
+                <textarea class="notes-textarea" placeholder="Take private notes here... (only visible to HR)&#10;&#10;e.g. Candidate seems confident, good understanding of DOM..."></textarea>
+                <button class="notes-save">Save Notes</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+    <div class="ctrl-group">
+        <button class="ctrl-btn" onclick="toggleMic(this)" id="micBtn" title="Microphone">
+            <div class="btn-icon" id="micIcon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+                    <path d="M19 10v2a7 7 0 01-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+            </div>
+            <span class="btn-label" id="micLabel">Mute</span>
+        </button>
+
+        <button class="ctrl-btn" onclick="toggleCam(this)" id="camBtn" title="Camera">
+            <div class="btn-icon" id="camIcon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 7l-7 5 7 5V7z"/>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                </svg>
+            </div>
+            <span class="btn-label" id="camLabel">Camera</span>
+        </button>
+    </div>
+
+    <div class="ctrl-divider"></div>
+
+    <div class="ctrl-group">
+        <button class="ctrl-btn" title="Share Screen">
+            <div class="btn-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+            </div>
+            <span class="btn-label">Share</span>
+        </button>
+
+        <button class="ctrl-btn" title="Reactions">
+            <div class="btn-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M8 13s1.5 2 4 2 4-2 4-2"/>
+                    <line x1="9" y1="9" x2="9.01" y2="9"/>
+                    <line x1="15" y1="9" x2="15.01" y2="9"/>
+                </svg>
+            </div>
+            <span class="btn-label">React</span>
+        </button>
+
+        <button class="ctrl-btn" title="Chat">
+            <div class="btn-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                </svg>
+            </div>
+            <span class="btn-label">Chat</span>
+        </button>
+
+        <button class="ctrl-btn" title="More Options">
+            <div class="btn-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+                </svg>
+            </div>
+            <span class="btn-label">More</span>
+        </button>
+    </div>
+
+    <div class="ctrl-divider"></div>
+
+    <button class="end-btn" onclick="confirmEnd()" title="End Interview">
+        <div class="end-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+            </svg>
+        </div>
+        <span class="end-label">End</span>
+    </button>
+
+    <div class="controls-info">
+        <div class="info-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 6l11 7L23 6"/><rect x="1" y="4" width="22" height="16" rx="2"/></svg>
+            ezo-rhsw-gwe
+        </div>
+        <div class="info-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1"/></svg>
+            HD
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+    <div class="toast-dot"></div>
+    <span id="toastMsg"></span>
+</div>
+
+<style>
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+</style>
+
+<script>
+    // ── TIMER ──
+    let seconds = 754;
+    setInterval(() => {
+        seconds++;
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        document.getElementById('timer').textContent =
+            (h > 0 ? String(h).padStart(2,'0') + ':' : '00:') +
+            String(m).padStart(2,'0') + ':' +
+            String(s).padStart(2,'0');
+    }, 1000);
+
+    // ── TYPING EFFECT ──
+    const typingText = "Excellent answer, Om! You've clearly understood the rendering pipeline. Now let me ask you about CSS layout — can you explain the difference between Flexbox and Grid, and when you'd choose one over the other?";
+    let charIdx = 0;
+    const typingEl = document.getElementById('typingText');
+    const typeInterval = setInterval(() => {
+        if (charIdx < typingText.length) {
+            typingEl.textContent += typingText[charIdx];
+            charIdx++;
+            const body = document.getElementById('transcriptBody');
+            body.scrollTop = body.scrollHeight;
+        } else {
+            clearInterval(typeInterval);
+            document.querySelector('.typing-cursor').style.display = 'none';
+            setTimeout(() => {
+                document.getElementById('aiTile').classList.remove('speaking');
+            }, 800);
+        }
+    }, 28);
+
+    // ── TABS ──
+    function switchTab(name, el) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    // ── MIC TOGGLE ──
+    let micMuted = false;
+    function toggleMic(btn) {
+        micMuted = !micMuted;
+        const icon = document.getElementById('micIcon');
+        const label = document.getElementById('micLabel');
+        if (micMuted) {
+            icon.classList.add('muted-state');
+            label.textContent = 'Unmute';
+            label.style.color = 'var(--red)';
+            showToast('Microphone muted');
+        } else {
+            icon.classList.remove('muted-state');
+            label.textContent = 'Mute';
+            label.style.color = '';
+            showToast('Microphone unmuted');
+        }
+    }
+
+    // ── CAM TOGGLE ──
+    let camOff = true;
+    function toggleCam(btn) {
+        camOff = !camOff;
+        const icon = document.getElementById('camIcon');
+        const label = document.getElementById('camLabel');
+        if (camOff) {
+            icon.classList.remove('danger');
+            label.textContent = 'Camera';
+            label.style.color = '';
+            showToast('Camera turned off');
+        } else {
+            showToast('Camera turned on');
+        }
+    }
+
+    // ── TOAST ──
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        document.getElementById('toastMsg').textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // ── END CONFIRM ──
+    function confirmEnd() {
+        if (confirm('Are you sure you want to end the interview session?')) {
+            showToast('Interview session ended. Generating report...');
+        }
+    }
+
+    // ── SIMULATED AI SPEAKING TOGGLE ──
+    // After typing finishes, simulate candidate speaking
+    setTimeout(() => {
+        const tile = document.getElementById('candidateTile');
+        tile.classList.add('speaking-candidate');
+    }, typingText.length * 28 + 2000);
+</script>
+</body>
+</html>

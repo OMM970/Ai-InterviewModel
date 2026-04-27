@@ -1,4 +1,11 @@
 spring:
+  ai:
+    openai:
+      api-key: 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
+      chat:
+        options:
+          model: gpt-4o-mini
+
   application:
     name: Ai-Interview
 
@@ -16,6 +23,7 @@ spring:
       host: localhost
       port: 27017
       database: credential_db
+
 
     redis:
       host: localhost
