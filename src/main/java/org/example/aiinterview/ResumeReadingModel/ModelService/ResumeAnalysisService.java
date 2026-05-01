@@ -18,7 +18,7 @@ import java.util.Map;
 public class ResumeAnalysisService {
 
     private final String GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-    private final String API_KEY = "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"; // 🔥 put your key here
+    private final String API_KEY = ""; // 🔥 put your key here
 
     public Map analyzeResume(String resumeText) {
 
