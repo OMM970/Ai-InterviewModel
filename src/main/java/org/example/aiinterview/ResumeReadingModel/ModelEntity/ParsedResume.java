@@ -6,14 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class ParsedResume {
-    private String resumeText;
 
     private List<String> skills;
-    private List<String> projects;
-    private List<String> experience;
+
+    private List<Map<String, Object>> projects;
+
+    private List<Map<String, Object>> experience;
 }

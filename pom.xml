@@ -104,16 +104,6 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
 
-        <!-- Spring AI OpenAI -->
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-model-openai</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-model-ollama</artifactId>
-        </dependency>
 
         <!-- Resume PDF Parsing -->
         <dependency>
