@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.aiinterview.InterViewBookingService.Enums.DifficultyLevel;
 import org.example.aiinterview.InterViewBookingService.Enums.Experience_Levels;
 import org.example.aiinterview.InterViewBookingService.Enums.Interview_Status;
 import org.example.aiinterview.InterViewBookingService.Enums.Interview_domain;
@@ -44,6 +45,13 @@ public class BookingEntity {
     private LocalDateTime interviewDateTime;
 
     private String admin_notes;
+
+    @Enumerated(EnumType.STRING)
+    private DifficultyLevel difficultyLevel;
+
+    private String resumeUrl;
+
+    private String extractedResumeId;
 
 
 

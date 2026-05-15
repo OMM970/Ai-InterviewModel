@@ -18,7 +18,7 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<booking_ResponseDto> createMeeting(
-            @RequestBody booking_RequestDto bookingRequestDto
+            @ModelAttribute booking_RequestDto bookingRequestDto
     ) {
 
         booking_ResponseDto response = bookingService.createMetting(bookingRequestDto);

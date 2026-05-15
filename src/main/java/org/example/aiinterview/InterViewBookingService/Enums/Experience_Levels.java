@@ -1,10 +1,10 @@
-package org.example.aiinterview.InterViewBookingService.Enums;
+    package org.example.aiinterview.InterViewBookingService.Enums;
 
-public enum Experience_Levels {
-    FRESHER,
-    JUNIOR,
-    MID_LEVEL,
-    SENIOR,
-    LEAD
+    public enum Experience_Levels {
+        FRESHER,
+        JUNIOR,
+        MID_LEVEL,
+        SENIOR,
+        LEAD
 
-}
+    }

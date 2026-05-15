@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -126,6 +125,171 @@
             resize: vertical;
         }
 
+        /* ── Resume Upload ── */
+        .file-drop {
+            position: relative;
+            border: 2px dashed var(--border-md);
+            border-radius: var(--radius);
+            background: var(--gray-100);
+            padding: 28px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .file-drop:hover,
+        .file-drop.dragover {
+            border-color: var(--purple-400);
+            background: #f3f2ff;
+        }
+
+        .file-drop input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            border: none;
+            background: transparent;
+        }
+
+        .file-drop input[type="file"]:focus {
+            box-shadow: none;
+            border: none;
+        }
+
+        .file-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .file-drop-text {
+            font-size: 14px;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        .file-drop-text strong {
+            color: var(--purple-600);
+        }
+
+        .file-drop-hint {
+            font-size: 12px;
+            color: var(--gray-400);
+            margin-top: 4px;
+        }
+
+        /* File chosen state */
+        .file-chosen {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: #ede9ff;
+            border: 1px solid var(--purple-400);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            margin-top: 8px;
+        }
+
+        .file-chosen.visible {
+            display: flex;
+        }
+
+        .file-chosen-name {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--purple-800);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-chosen-size {
+            font-size: 12px;
+            color: var(--gray-400);
+            white-space: nowrap;
+        }
+
+        .file-remove-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray-400);
+            font-size: 16px;
+            line-height: 1;
+            padding: 0 2px;
+            transition: color 0.15s;
+        }
+
+        .file-remove-btn:hover {
+            color: #ef4444;
+        }
+
+        /* Difficulty toggle buttons */
+        .difficulty-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .difficulty-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .diff-btn {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border-md);
+            border-radius: var(--radius);
+            background: var(--gray-100);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+            color: var(--gray-600);
+            font-family: var(--font);
+        }
+
+        .diff-btn:hover {
+            background: var(--gray-200);
+        }
+
+        .diff-btn.selected-easy {
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #15803d;
+        }
+
+        .diff-btn.selected-medium {
+            background: #fef9c3;
+            border-color: #eab308;
+            color: #a16207;
+        }
+
+        .diff-btn.selected-hard {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #b91c1c;
+        }
+
+        .diff-badge {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .badge-easy   { background: #22c55e; }
+        .badge-medium { background: #eab308; }
+        .badge-hard   { background: #ef4444; }
+
+        /* Submit button */
         .submit-btn {
             width: 100%;
             margin-top: 2rem;
@@ -137,6 +301,12 @@
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
+            font-family: var(--font);
+            transition: opacity 0.2s;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            opacity: 0.9;
         }
 
         .submit-btn:disabled {
@@ -150,13 +320,23 @@
             border-color: red;
         }
 
+        .form-group.error .file-drop {
+            border-color: red;
+        }
+
+        .difficulty-group.error .difficulty-options {
+            outline: 1px solid red;
+            border-radius: var(--radius);
+        }
+
         .err-msg {
             display: none;
             color: red;
             font-size: 12px;
         }
 
-        .form-group.error .err-msg {
+        .form-group.error .err-msg,
+        .difficulty-group.error .err-msg {
             display: block;
         }
 
@@ -172,8 +352,6 @@
             margin-top: 1.5rem;
         }
 
-
-
         .cred-row {
             display: flex;
             justify-content: space-between;
@@ -185,9 +363,12 @@
             border-bottom: none;
         }
 
-        @media(max-width: 600px) {
+        @media (max-width: 600px) {
             .form-grid {
                 grid-template-columns: 1fr;
+            }
+            .difficulty-options {
+                flex-direction: column;
             }
         }
     </style>
@@ -250,11 +431,7 @@
 
                 <div class="form-group full" id="grp-custom-domain" style="display: none;">
                     <label>Custom Domain <span class="req">*</span></label>
-                    <input
-                            type="text"
-                            id="customDomain"
-                            placeholder="e.g. SAP Consultant, Legal Advisor, Supply Chain Analyst"
-                    >
+                    <input type="text" id="customDomain" placeholder="e.g. SAP Consultant, Legal Advisor, Supply Chain Analyst">
                     <span class="err-msg">Please enter custom domain.</span>
                 </div>
 
@@ -271,10 +448,56 @@
                     <span class="err-msg">Please select experience.</span>
                 </div>
 
+                <div class="form-group full difficulty-group" id="grp-difficulty">
+                    <label>Difficulty Level <span class="req">*</span></label>
+                    <div class="difficulty-options">
+                        <button type="button" class="diff-btn" id="diff-EASY" onclick="selectDifficulty('EASY')">
+                            <span class="diff-badge badge-easy"></span>Easy
+                        </button>
+                        <button type="button" class="diff-btn" id="diff-MEDIUM" onclick="selectDifficulty('MEDIUM')">
+                            <span class="diff-badge badge-medium"></span>Medium
+                        </button>
+                        <button type="button" class="diff-btn" id="diff-HARD" onclick="selectDifficulty('HARD')">
+                            <span class="diff-badge badge-hard"></span>Hard
+                        </button>
+                    </div>
+                    <span class="err-msg">Please select a difficulty level.</span>
+                </div>
+
                 <div class="form-group full" id="grp-date">
                     <label>Interview Date & Time <span class="req">*</span></label>
                     <input type="datetime-local" id="interviewDate">
                     <span class="err-msg">Please select date and time.</span>
+                </div>
+
+                <!-- ── Resume Upload ── -->
+                <div class="form-group full" id="grp-resume">
+                    <label>Resume <span class="req">*</span></label>
+
+                    <div class="file-drop" id="fileDrop"
+                         ondragover="handleDragOver(event)"
+                         ondragleave="handleDragLeave(event)"
+                         ondrop="handleDrop(event)">
+                        <input type="file" id="resumeFile"
+                               accept=".pdf,.doc,.docx"
+                               onchange="handleFileChange(event)" />
+                        <div class="file-icon">📄</div>
+                        <div class="file-drop-text">
+                            <strong>Click to upload</strong> or drag &amp; drop
+                        </div>
+                        <div class="file-drop-hint">PDF, DOC, DOCX — max 5 MB</div>
+                    </div>
+
+                    <!-- Chosen file preview -->
+                    <div class="file-chosen" id="fileChosen">
+                        <span>📎</span>
+                        <span class="file-chosen-name" id="fileChosenName"></span>
+                        <span class="file-chosen-size" id="fileChosenSize"></span>
+                        <button type="button" class="file-remove-btn"
+                                onclick="removeFile()" title="Remove file">✕</button>
+                    </div>
+
+                    <span class="err-msg">Please upload candidate resume.</span>
                 </div>
 
                 <div class="form-group full">
@@ -293,31 +516,15 @@
             <h2>Interview Scheduled Successfully</h2>
 
             <div class="cred-card">
-                <div class="cred-row">
-                    <span>Name</span>
-                    <span id="outName"></span>
-                </div>
-                <div class="cred-row">
-                    <span>Email</span>
-                    <span id="outEmail"></span>
-                </div>
-                <div class="cred-row">
-                    <span>Domain</span>
-                    <span id="outDomain"></span>
-                </div>
-                <div class="cred-row">
-                    <span>Experience</span>
-                    <span id="outExp"></span>
-                </div>
-                <div class="cred-row">
-                    <span>Date</span>
-                    <span id="outDate"></span>
-                </div>
-                <div class="cred-row">
-                    <span>Interview ID</span>
-                    <span id="outInterviewId"></span>
-                </div>
+                <div class="cred-row"><span>Name</span><span id="outName"></span></div>
+                <div class="cred-row"><span>Email</span><span id="outEmail"></span></div>
+                <div class="cred-row"><span>Domain</span><span id="outDomain"></span></div>
+                <div class="cred-row"><span>Experience</span><span id="outExp"></span></div>
+                <div class="cred-row"><span>Difficulty</span><span id="outDifficulty"></span></div>
+                <div class="cred-row"><span>Date</span><span id="outDate"></span></div>
+                <div class="cred-row"><span>Interview ID</span><span id="outInterviewId"></span></div>
             </div>
+
             <p style="margin-top:16px; color:#b45309; font-size:13px; line-height:1.6;">
                 Warning: The password has been sent to the candidate email and will expire at 11:59 PM on the interview day.
             </p>
@@ -327,145 +534,199 @@
 </div>
 
 <script>
-    function setErr(id, show) {
-        const group = document.getElementById(id);
+    var selectedDifficulty = '';
+    var selectedFile = null;
 
-        if (show) {
-            group.classList.add('error');
-        } else {
-            group.classList.remove('error');
+    /* ── File Upload Handlers ── */
+
+    function handleFileChange(event) {
+        var file = event.target.files[0];
+        if (file) applyFile(file);
+    }
+
+    function handleDragOver(event) {
+        event.preventDefault();
+        document.getElementById('fileDrop').classList.add('dragover');
+    }
+
+    function handleDragLeave(event) {
+        document.getElementById('fileDrop').classList.remove('dragover');
+    }
+
+    function handleDrop(event) {
+        event.preventDefault();
+        document.getElementById('fileDrop').classList.remove('dragover');
+        var file = event.dataTransfer.files[0];
+        if (file) applyFile(file);
+    }
+
+    function applyFile(file) {
+        var allowed = ['application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!allowed.includes(file.type) &&
+            !file.name.match(/\.(pdf|doc|docx)$/i)) {
+            alert('Only PDF, DOC, or DOCX files are accepted.');
+            return;
         }
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be 5 MB or less.');
+            return;
+        }
+
+        selectedFile = file;
+
+        document.getElementById('fileChosenName').textContent = file.name;
+        document.getElementById('fileChosenSize').textContent = formatFileSize(file.size);
+        document.getElementById('fileChosen').classList.add('visible');
+        clearErr('grp-resume');
     }
 
-    function clearErr(id) {
-        setErr(id, false);
+    function removeFile() {
+        selectedFile = null;
+        document.getElementById('resumeFile').value = '';
+        document.getElementById('fileChosen').classList.remove('visible');
+        document.getElementById('fileChosenName').textContent = '';
+        document.getElementById('fileChosenSize').textContent = '';
     }
+
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    /* ── Difficulty ── */
+
+    function selectDifficulty(level) {
+        ['EASY', 'MEDIUM', 'HARD'].forEach(function(l) {
+            var btn = document.getElementById('diff-' + l);
+            btn.className = 'diff-btn';
+            btn.innerHTML = '<span class="diff-badge badge-' + l.toLowerCase() + '"></span>' +
+                l.charAt(0) + l.slice(1).toLowerCase();
+        });
+        selectedDifficulty = level;
+        var active = document.getElementById('diff-' + level);
+        active.classList.add('selected-' + level.toLowerCase());
+        clearErr('grp-difficulty');
+    }
+
+    /* ── Validation helpers ── */
+
+    function setErr(id, show) {
+        var g = document.getElementById(id);
+        if (show) g.classList.add('error');
+        else g.classList.remove('error');
+    }
+
+    function clearErr(id) { setErr(id, false); }
 
     function formatEnum(value) {
         return value
             .toLowerCase()
             .replace(/_/g, ' ')
-            .replace(/\b\w/g, char => char.toUpperCase());
+            .replace(/\b\w/g, function(c) { return c.toUpperCase(); });
     }
 
     function validate() {
-        let ok = true;
+        var name  = document.getElementById('candidateName').value.trim();
+        var email = document.getElementById('candidateEmail').value.trim();
+        var dom   = document.getElementById('domain').value;
+        var customDomain = document.getElementById('customDomain').value.trim();
+        var exp   = document.getElementById('experience').value;
+        var date  = document.getElementById('interviewDate').value;
 
-        const name = document.getElementById('candidateName').value.trim();
-        const email = document.getElementById('candidateEmail').value.trim();
-        const dom = document.getElementById('domain').value;
-        const customDomain = document.getElementById('customDomain')?.value.trim();
-        const exp = document.getElementById('experience').value;
-        const date = document.getElementById('interviewDate').value;
-
-        setErr('grp-name', !name);
-        setErr('grp-email', !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
-        setErr('grp-domain', !dom);
+        setErr('grp-name',       !name);
+        setErr('grp-email',      !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+        setErr('grp-domain',     !dom);
         setErr('grp-experience', !exp);
-        setErr('grp-date', !date);
+        setErr('grp-date',       !date);
+        setErr('grp-difficulty', !selectedDifficulty);
+        setErr('grp-resume',     !selectedFile);
 
-        if (dom === 'OTHERS') {
-            setErr('grp-custom-domain', !customDomain);
-        } else {
-            clearErr('grp-custom-domain');
-        }
+        if (dom === 'OTHERS') setErr('grp-custom-domain', !customDomain);
+        else clearErr('grp-custom-domain');
 
-        if (
-            !name ||
-            !email ||
-            !dom ||
-            !exp ||
-            !date ||
-            (dom === 'OTHERS' && !customDomain)
-        ) {
-            ok = false;
-        }
-
-        return ok;
+        return name &&
+            email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
+            dom && exp && date && selectedDifficulty && selectedFile &&
+            !(dom === 'OTHERS' && !customDomain);
     }
 
-    [
-        'candidateName',
-        'candidateEmail',
-        'domain',
-        'experience',
-        'interviewDate'
-    ].forEach(id => {
-        const el = document.getElementById(id);
-
-        const map = {
+    /* Live clear-on-type */
+    ['candidateName', 'candidateEmail', 'domain', 'experience', 'interviewDate'].forEach(function(id) {
+        var map = {
             candidateName: 'grp-name',
             candidateEmail: 'grp-email',
             domain: 'grp-domain',
             experience: 'grp-experience',
             interviewDate: 'grp-date'
         };
-
-        el.addEventListener('input', () => clearErr(map[id]));
-        el.addEventListener('change', () => clearErr(map[id]));
+        var el = document.getElementById(id);
+        el.addEventListener('input',  function() { clearErr(map[id]); });
+        el.addEventListener('change', function() { clearErr(map[id]); });
     });
 
-    document.getElementById('domain').addEventListener('change', function () {
-        const customDomainGroup = document.getElementById('grp-custom-domain');
-
+    document.getElementById('domain').addEventListener('change', function() {
+        var cg = document.getElementById('grp-custom-domain');
         if (this.value === 'OTHERS') {
-            customDomainGroup.style.display = 'flex';
+            cg.style.display = 'flex';
         } else {
-            customDomainGroup.style.display = 'none';
+            cg.style.display = 'none';
             document.getElementById('customDomain').value = '';
             clearErr('grp-custom-domain');
         }
     });
 
+    /* ── Submit — sends multipart/form-data ── */
+
     async function handleSubmit() {
         if (!validate()) return;
 
-        const btn = document.getElementById('submitBtn');
+        var btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.innerText = 'Processing...';
 
-        const payload = {
-            fullName: document.getElementById('candidateName').value.trim(),
-            email: document.getElementById('candidateEmail').value.trim(),
-            interview_Domain: document.getElementById('domain').value,
-            others_Domain: document.getElementById('customDomain')?.value.trim() || '',
-            experience_Level: document.getElementById('experience').value,
-            interviewDateTime: document.getElementById('interviewDate').value,
-            admin_notes: document.getElementById('adminNotes').value.trim()
-        };
+        // Build FormData — Spring reads this via @ModelAttribute
+        var formData = new FormData();
+        formData.append('fullName',           document.getElementById('candidateName').value.trim());
+        formData.append('email',              document.getElementById('candidateEmail').value.trim());
+        formData.append('interview_Domain',   document.getElementById('domain').value);
+        formData.append('others_Domain',      document.getElementById('customDomain').value.trim());
+        formData.append('experience_Level',   document.getElementById('experience').value);
+        formData.append('difficultyLevel',   selectedDifficulty);
+        formData.append('interviewDateTime',  document.getElementById('interviewDate').value);
+        formData.append('admin_notes',        document.getElementById('adminNotes').value.trim());
+        formData.append('resume',             selectedFile, selectedFile.name); // ← file field
 
         try {
-            const response = await fetch('http://localhost:2999/schedule/interview', {
+            var response = await fetch('http://localhost:2999/schedule/interview', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
+                // Do NOT set Content-Type manually — browser sets it with boundary automatically
+                body: formData
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to save interview');
-            }
+            if (!response.ok) throw new Error('Failed to save interview');
 
-            const data = await response.json();
+           
+
+            var data = await response.json();
+            console.log(data)
 
             document.getElementById('outName').textContent = data.fullName;
             document.getElementById('outEmail').textContent = data.email;
-
             document.getElementById('outDomain').textContent =
-                data.interview_Domain === 'OTHERS'
-                    ? data.others_Domain
-                    : formatEnum(data.interview_Domain);
-
+                data.interview_Domain === 'OTHERS' ? data.others_Domain : formatEnum(data.interview_Domain);
             document.getElementById('outExp').textContent = formatEnum(data.experience_Level);
+            document.getElementById('outDifficulty').textContent = formatEnum(data.difficulty_Level || selectedDifficulty);
             document.getElementById('outDate').textContent = new Date(data.interviewDateTime).toLocaleString('en-IN');
-            document.getElementById('outDate').textContent = new Date(data.interviewDateTime).toLocaleString('en-IN');
+            document.getElementById('outInterviewId').textContent = data.interviewId || '—';
 
             document.getElementById('formSection').style.display = 'none';
             document.getElementById('successSection').style.display = 'block';
 
-        } catch (error) {
-            alert(error.message);
+        } catch (err) {
+            alert(err.message);
         } finally {
             btn.disabled = false;
             btn.innerText = 'Book Interview';
@@ -475,4 +736,3 @@
 
 </body>
 </html>
-```

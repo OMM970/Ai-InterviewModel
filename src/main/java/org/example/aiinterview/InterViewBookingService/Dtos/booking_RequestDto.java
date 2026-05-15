@@ -8,9 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.aiinterview.InterViewBookingService.Enums.DifficultyLevel;
 import org.example.aiinterview.InterViewBookingService.Enums.Experience_Levels;
 import org.example.aiinterview.InterViewBookingService.Enums.Interview_Status;
 import org.example.aiinterview.InterViewBookingService.Enums.Interview_domain;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -37,6 +39,10 @@ public class booking_RequestDto {
     private LocalDateTime interviewDateTime;
 
     private String admin_notes;
+
+    private DifficultyLevel difficultyLevel;
+
+    private MultipartFile resume;
 
 
 }

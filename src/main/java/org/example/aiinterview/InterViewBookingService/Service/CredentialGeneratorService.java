@@ -22,7 +22,7 @@ public class CredentialGeneratorService {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     public static String generateInterviewId() {
-        return "INT_" + new BigInteger(50, RANDOM)
+        return "TSH-" + new BigInteger(50, RANDOM)
                 .toString(32)
                 .toUpperCase();
     }
