@@ -1,4 +1,8 @@
 spring:
+
+
+
+
   application:
     name: Ai-Interview
 
@@ -16,6 +20,7 @@ spring:
       host: localhost
       port: 27017
       database: credential_db
+
 
     redis:
       host: localhost
