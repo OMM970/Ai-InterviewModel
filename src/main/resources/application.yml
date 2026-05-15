@@ -42,10 +42,10 @@ server:
 aws:
 
   access:
-    key: AKIATQEFB32E35BO3G5C
+    key:
 
   secret:
-    key: xf3e23/LXZI+pH8EwOvNzpHgC8Q6f8cbygYJfAk0
+    key:
 
   region: eu-north-1
 
