@@ -1,8 +1,5 @@
 spring:
 
-
-
-
   application:
     name: Ai-Interview
 
@@ -16,11 +13,11 @@ spring:
       ddl-auto: update
 
   data:
+
     mongodb:
       host: localhost
       port: 27017
       database: credential_db
-
 
     redis:
       host: localhost
@@ -31,6 +28,7 @@ spring:
     port: 587
     username: csflight534@gmail.com
     password: wrguultwxqjxqipl
+
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
@@ -40,3 +38,17 @@ spring:
 
 server:
   port: 2999
+
+aws:
+
+  access:
+    key: AKIATQEFB32E35BO3G5C
+
+  secret:
+    key: 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
+
+  region: eu-north-1
+
+  s3:
+    bucket:
+      name: amzn-s3-projectai

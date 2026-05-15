@@ -2,12 +2,17 @@ package org.example.aiinterview.ResumeReadingModel.ModelService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +23,7 @@ import java.util.Map;
 public class ResumeAnalysisService {
 
     private final String GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-    private final String API_KEY = ""; // 🔥 put your key here
+    private final String API_KEY = "";
 
     public Map analyzeResume(String resumeText) {
 
@@ -131,6 +136,64 @@ Resume:
                     "focusAreas", List.of(),
                     "suggestedTopics", List.of(),
                     "experienceLevel", "Unknown"
+            );
+        }
+    }
+
+    public String extractText(MultipartFile file) {
+
+        try {
+
+            String fileName = file.getOriginalFilename();
+
+            if (fileName == null) {
+                throw new RuntimeException("Invalid file");
+            }
+
+            // PDF Extraction
+            if (fileName.toLowerCase().endsWith(".pdf")) {
+
+                PDDocument document =
+                        PDDocument.load(file.getInputStream());
+
+                PDFTextStripper stripper =
+                        new PDFTextStripper();
+
+                String text = stripper.getText(document);
+
+                document.close();
+
+                return text;
+            }
+
+            // DOCX Extraction
+            else if (fileName.toLowerCase().endsWith(".docx")) {
+
+                XWPFDocument document =
+                        new XWPFDocument(file.getInputStream());
+
+                XWPFWordExtractor extractor =
+                        new XWPFWordExtractor(document);
+
+                String text = extractor.getText();
+
+                extractor.close();
+                document.close();
+
+                return text;
+            }
+
+            else {
+                throw new RuntimeException(
+                        "Unsupported file type"
+                );
+            }
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(
+                    "Resume text extraction failed",
+                    e
             );
         }
     }

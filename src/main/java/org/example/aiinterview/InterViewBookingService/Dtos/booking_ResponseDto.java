@@ -25,6 +25,7 @@ public class booking_ResponseDto {
     private String admin_notes;
     private String others_domain;
     private String userID;
+    private String extracted_TextId;
 
 
 }
