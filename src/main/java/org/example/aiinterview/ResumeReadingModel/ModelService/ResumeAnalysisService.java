@@ -6,6 +6,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.example.aiinterview.ResumeReadingModel.ModelDto.ResumeResponseDto;
+import org.example.aiinterview.ResumeReadingModel.ModelEntity.ParsedResume;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,7 +27,9 @@ public class ResumeAnalysisService {
     private final String GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
     private final String API_KEY = "";
 
-    public Map analyzeResume(String resumeText) {
+    public ResumeResponseDto analyzeResume(
+            String resumeText
+    ) {
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -125,76 +129,44 @@ Resume:
                 content = content.substring(start, end + 1);
             }
 
-            return mapper.readValue(content, Map.class);
+            return mapper.readValue(
+                    content,
+                    ResumeResponseDto.class
+            );
 
         } catch (Exception e) {
+
             e.printStackTrace();
-            return Map.of(
-                    "skills", List.of(),
-                    "projects", List.of(),
-                    "experience", List.of(),
-                    "focusAreas", List.of(),
-                    "suggestedTopics", List.of(),
-                    "experienceLevel", "Unknown"
-            );
+
+            return ResumeResponseDto.builder()
+
+                    .candidateName("Not Available")
+
+                    .email("Not Available")
+
+                    .parsedResume(
+
+                            ParsedResume.builder()
+
+                                    .skills(List.of())
+
+                                    .projects(List.of())
+
+                                    .experience(List.of())
+
+                                    .build()
+                    )
+
+                    .experienceLevel("Unknown")
+
+                    .focusAreas(List.of())
+
+                    .strengths(List.of())
+
+                    .suggestedTopics(List.of())
+
+                    .build();
         }
     }
 
-    public String extractText(MultipartFile file) {
-
-        try {
-
-            String fileName = file.getOriginalFilename();
-
-            if (fileName == null) {
-                throw new RuntimeException("Invalid file");
-            }
-
-            // PDF Extraction
-            if (fileName.toLowerCase().endsWith(".pdf")) {
-
-                PDDocument document =
-                        PDDocument.load(file.getInputStream());
-
-                PDFTextStripper stripper =
-                        new PDFTextStripper();
-
-                String text = stripper.getText(document);
-
-                document.close();
-
-                return text;
-            }
-
-            // DOCX Extraction
-            else if (fileName.toLowerCase().endsWith(".docx")) {
-
-                XWPFDocument document =
-                        new XWPFDocument(file.getInputStream());
-
-                XWPFWordExtractor extractor =
-                        new XWPFWordExtractor(document);
-
-                String text = extractor.getText();
-
-                extractor.close();
-                document.close();
-
-                return text;
-            }
-
-            else {
-                throw new RuntimeException(
-                        "Unsupported file type"
-                );
-            }
-
-        } catch (Exception e) {
-
-            throw new RuntimeException(
-                    "Resume text extraction failed",
-                    e
-            );
-        }
-    }
    }
